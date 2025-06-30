@@ -355,28 +355,29 @@
         let lastInputSent = 0;
       
       const levels = [
-            // Level 1: Basic Introduction
+            // Level 1: Tutorial - Basic movement and doors
             {
                 name: "First Steps",
                 platforms: [
                     { x: 0, y: 550, width: 1000, height: 50, color: '#8b4513' },
                     { x: 200, y: 450, width: 150, height: 20, color: '#8b4513' },
-                    { x: 450, y: 350, width: 150, height: 20, color: '#8b4513' },
-                    { x: 700, y: 250, width: 150, height: 20, color: '#8b4513' }
+                    { x: 450, y: 380, width: 150, height: 20, color: '#8b4513' },
+                    { x: 700, y: 320, width: 200, height: 20, color: '#8b4513' }
                 ],
                 hazards: [
                     { x: 300, y: 530, width: 80, height: 20, type: 'water', color: '#0074d9' },
                     { x: 600, y: 530, width: 80, height: 20, type: 'fire', color: '#ff4136' }
                 ],
                 doors: [
-                    { x: 920, y: 500, width: 35, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 960, y: 500, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                    { x: 750, y: 270, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 815, y: 270, width: 35, height: 50, type: 'water', color: '#3742fa' }
                 ],
                 switches: []
             },
-            // Level 2: Switch Introduction
+            
+            // Level 2: Switch introduction
             {
-                name: "Learning to Cooperate",
+                name: "Learning Switches",
                 platforms: [
                     { x: 0, y: 550, width: 1000, height: 50, color: '#8b4513' },
                     { x: 150, y: 450, width: 100, height: 20, color: '#8b4513' },
@@ -387,539 +388,637 @@
                 ],
                 hazards: [
                     { x: 270, y: 530, width: 60, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 470, y: 530, width: 60, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 670, y: 530, width: 60, height: 20, type: 'fire', color: '#ff4136' }
-                ],
-                doors: [
-                    { x: 430, y: 150, width: 35, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 535, y: 150, width: 35, height: 50, type: 'water', color: '#3742fa' }
-                ],
-                switches: [
-                    { x: 200, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 800, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
-                ]
-            },
-            // Level 3: The Bridge Gap
-            {
-                name: "Bridge Building",
-                platforms: [
-                    { x: 0, y: 550, width: 200, height: 50, color: '#8b4513' },
-                    { x: 300, y: 450, width: 100, height: 20, color: '#8b4513' },
-                    { x: 500, y: 400, width: 100, height: 20, color: '#8b4513' },
-                    { x: 700, y: 350, width: 300, height: 20, color: '#8b4513' },
-                    { x: 800, y: 550, width: 200, height: 50, color: '#8b4513' }
-                ],
-                hazards: [
-                    { x: 220, y: 530, width: 60, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 720, y: 530, width: 60, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 420, y: 380, width: 60, height: 20, type: 'fire', color: '#ff4136' }
-                ],
-                doors: [
-                    { x: 930, y: 500, width: 35, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 965, y: 500, width: 35, height: 50, type: 'water', color: '#3742fa' }
-                ],
-                switches: [
-                    { x: 50, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 850, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' }
-                ]
-            },
-            // Level 4: Elevator Teamwork
-            {
-                name: "Rising Together",
-                platforms: [
-                    { x: 0, y: 550, width: 150, height: 50, color: '#8b4513' },
-                    { x: 200, y: 350, width: 80, height: 20, color: '#8b4513' },
-                    { x: 350, y: 450, width: 80, height: 20, color: '#8b4513' },
-                    { x: 500, y: 250, width: 80, height: 20, color: '#8b4513' },
-                    { x: 650, y: 400, width: 80, height: 20, color: '#8b4513' },
-                    { x: 800, y: 150, width: 200, height: 20, color: '#8b4513' }
-                ],
-                hazards: [
-                    { x: 300, y: 430, width: 40, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 600, y: 380, width: 40, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 750, y: 130, width: 40, height: 20, type: 'water', color: '#0074d9' }
-                ],
-                doors: [
-                    { x: 820, y: 100, width: 35, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 865, y: 100, width: 35, height: 50, type: 'water', color: '#3742fa' }
-                ],
-                switches: [
-                    { x: 230, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 380, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 530, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' }
-                ]
-            },
-            // Level 5: The Split Path
-            {
-                name: "Divided We Stand",
-                platforms: [
-                    { x: 0, y: 550, width: 100, height: 50, color: '#8b4513' },
-                    { x: 150, y: 450, width: 50, height: 20, color: '#8b4513' },
-                    { x: 150, y: 350, width: 50, height: 20, color: '#8b4513' },
-                    { x: 250, y: 250, width: 50, height: 20, color: '#8b4513' },
-                    { x: 350, y: 150, width: 300, height: 20, color: '#8b4513' },
-                    { x: 700, y: 250, width: 50, height: 20, color: '#8b4513' },
-                    { x: 800, y: 350, width: 50, height: 20, color: '#8b4513' },
-                    { x: 800, y: 450, width: 50, height: 20, color: '#8b4513' },
-                    { x: 900, y: 550, width: 100, height: 50, color: '#8b4513' }
-                ],
-                hazards: [
-                    { x: 120, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 210, y: 430, width: 30, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 760, y: 430, width: 30, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 870, y: 530, width: 20, height: 20, type: 'water', color: '#0074d9' }
-                ],
-                doors: [
-                    { x: 450, y: 100, width: 35, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 515, y: 100, width: 35, height: 50, type: 'water', color: '#3742fa' }
-                ],
-                switches: [
-                    { x: 280, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 730, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
-                ]
-            },
-            // Level 6: Mirror Maze
-            {
-                name: "Reflection Chamber",
-                platforms: [
-                    { x: 0, y: 550, width: 100, height: 50, color: '#8b4513' },
-                    { x: 150, y: 450, width: 100, height: 20, color: '#8b4513' },
-                    { x: 300, y: 350, width: 100, height: 20, color: '#8b4513' },
-                    { x: 450, y: 450, width: 100, height: 20, color: '#8b4513' },
-                    { x: 600, y: 350, width: 100, height: 20, color: '#8b4513' },
-                    { x: 750, y: 450, width: 100, height: 20, color: '#8b4513' },
-                    { x: 900, y: 550, width: 100, height: 50, color: '#8b4513' },
-                    { x: 400, y: 200, width: 200, height: 20, color: '#8b4513' }
-                ],
-                hazards: [
-                    { x: 120, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 270, y: 430, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 420, y: 330, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 570, y: 330, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 720, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 870, y: 430, width: 20, height: 20, type: 'fire', color: '#ff4136' }
+                    { x: 470, y: 530, width: 60, height: 20, type: 'water', color: '#0074d9' }
                 ],
                 doors: [
                     { x: 450, y: 150, width: 35, height: 50, type: 'fire', color: '#ff4757' },
                     { x: 515, y: 150, width: 35, height: 50, type: 'water', color: '#3742fa' }
                 ],
                 switches: [
-                    { x: 50, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 930, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 480, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 630, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                    { x: 200, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 800, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
                 ]
             },
-            // Level 7: The Tower Climb
+            
+            // Level 3: Bridge cooperation
             {
-                name: "Spiral Ascension",
-                platforms: [
-                    { x: 0, y: 550, width: 200, height: 50, color: '#8b4513' },
-                    { x: 250, y: 500, width: 80, height: 20, color: '#8b4513' },
-                    { x: 380, y: 450, width: 80, height: 20, color: '#8b4513' },
-                    { x: 510, y: 400, width: 80, height: 20, color: '#8b4513' },
-                    { x: 640, y: 350, width: 80, height: 20, color: '#8b4513' },
-                    { x: 500, y: 300, width: 80, height: 20, color: '#8b4513' },
-                    { x: 360, y: 250, width: 80, height: 20, color: '#8b4513' },
-                    { x: 220, y: 200, width: 80, height: 20, color: '#8b4513' },
-                    { x: 400, y: 100, width: 200, height: 20, color: '#8b4513' }
-                ],
-                hazards: [
-                    { x: 220, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 340, y: 480, width: 30, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 470, y: 430, width: 30, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 600, y: 380, width: 30, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 450, y: 280, width: 40, height: 20, type: 'fire', color: '#ff4136' }
-                ],
-                doors: [
-                    { x: 450, y: 50, width: 35, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 515, y: 50, width: 35, height: 50, type: 'water', color: '#3742fa' }
-                ],
-                switches: [
-                    { x: 280, y: 480, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 410, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 540, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 250, y: 180, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' }
-                ]
-            },
-            // Level 8: Hazard Highway
-            {
-                name: "Dangerous Crossing",
-                platforms: [
-                    { x: 0, y: 550, width: 100, height: 50, color: '#8b4513' },
-                    { x: 150, y: 450, width: 60, height: 20, color: '#8b4513' },
-                    { x: 260, y: 350, width: 60, height: 20, color: '#8b4513' },
-                    { x: 370, y: 250, width: 60, height: 20, color: '#8b4513' },
-                    { x: 480, y: 350, width: 60, height: 20, color: '#8b4513' },
-                    { x: 590, y: 450, width: 60, height: 20, color: '#8b4513' },
-                    { x: 700, y: 350, width: 60, height: 20, color: '#8b4513' },
-                    { x: 810, y: 250, width: 60, height: 20, color: '#8b4513' },
-                    { x: 900, y: 450, width: 100, height: 20, color: '#8b4513' }
-                ],
-                hazards: [
-                    { x: 120, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 230, y: 330, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 340, y: 230, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 450, y: 330, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 560, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 670, y: 330, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 780, y: 230, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 870, y: 430, width: 20, height: 20, type: 'fire', color: '#ff4136' }
-                ],
-                doors: [
-                    { x: 920, y: 400, width: 35, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 955, y: 400, width: 35, height: 50, type: 'water', color: '#3742fa' }
-                ],
-                switches: [
-                    { x: 50, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 180, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 400, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 730, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
-                ]
-            },
-            // Level 9: The Great Divide
-            {
-                name: "Chasm Challenge",
+                name: "Bridge Building",
                 platforms: [
                     { x: 0, y: 550, width: 150, height: 50, color: '#8b4513' },
-                    { x: 200, y: 400, width: 100, height: 200, color: '#8b4513' },
-                    { x: 350, y: 300, width: 100, height: 20, color: '#8b4513' },
-                    { x: 550, y: 300, width: 100, height: 20, color: '#8b4513' },
-                    { x: 700, y: 400, width: 100, height: 200, color: '#8b4513' },
+                    { x: 250, y: 480, width: 80, height: 20, color: '#8b4513' },
+                    { x: 400, y: 420, width: 80, height: 20, color: '#8b4513' },
+                    { x: 550, y: 360, width: 80, height: 20, color: '#8b4513' },
+                    { x: 700, y: 300, width: 80, height: 20, color: '#8b4513' },
                     { x: 850, y: 550, width: 150, height: 50, color: '#8b4513' },
-                    { x: 100, y: 200, width: 80, height: 20, color: '#8b4513' },
-                    { x: 820, y: 200, width: 80, height: 20, color: '#8b4513' }
+                    { x: 400, y: 200, width: 200, height: 20, color: '#8b4513' }
                 ],
                 hazards: [
-                    { x: 320, y: 580, width: 360, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 380, y: 280, width: 40, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 580, y: 280, width: 40, height: 20, type: 'fire', color: '#ff4136' }
+                    { x: 170, y: 530, width: 60, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 330, y: 460, width: 50, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 480, y: 400, width: 50, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 630, y: 340, width: 50, height: 20, type: 'fire', color: '#ff4136' }
                 ],
                 doors: [
-                    { x: 130, y: 150, width: 35, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 835, y: 150, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                    { x: 450, y: 150, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 515, y: 150, width: 35, height: 50, type: 'water', color: '#3742fa' }
                 ],
                 switches: [
-                    { x: 250, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 750, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 400, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 600, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                    { x: 50, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 750, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' }
                 ]
             },
-            // Level 10: Switch Symphony
+            
+            // Level 4: Elevator mechanics
             {
-                name: "Harmonic Cooperation",
+                name: "Rising Together",
                 platforms: [
                     { x: 0, y: 550, width: 120, height: 50, color: '#8b4513' },
-                    { x: 170, y: 450, width: 80, height: 20, color: '#8b4513' },
-                    { x: 300, y: 350, width: 80, height: 20, color: '#8b4513' },
-                    { x: 430, y: 250, width: 80, height: 20, color: '#8b4513' },
-                    { x: 560, y: 350, width: 80, height: 20, color: '#8b4513' },
-                    { x: 690, y: 450, width: 80, height: 20, color: '#8b4513' },
-                    { x: 820, y: 550, width: 120, height: 50, color: '#8b4513' },
-                    { x: 400, y: 100, width: 200, height: 20, color: '#8b4513' }
+                    { x: 180, y: 480, width: 60, height: 20, color: '#8b4513' },
+                    { x: 300, y: 420, width: 60, height: 20, color: '#8b4513' },
+                    { x: 420, y: 360, width: 60, height: 20, color: '#8b4513' },
+                    { x: 540, y: 300, width: 60, height: 20, color: '#8b4513' },
+                    { x: 660, y: 240, width: 60, height: 20, color: '#8b4513' },
+                    { x: 780, y: 180, width: 120, height: 20, color: '#8b4513' },
+                    { x: 400, y: 120, width: 200, height: 20, color: '#8b4513' }
                 ],
                 hazards: [
-                    { x: 140, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 270, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 400, y: 330, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 530, y: 330, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 660, y: 430, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 790, y: 530, width: 20, height: 20, type: 'water', color: '#0074d9' }
+                    { x: 140, y: 530, width: 30, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 260, y: 460, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 380, y: 400, width: 30, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 500, y: 340, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 620, y: 280, width: 30, height: 20, type: 'fire', color: '#ff4136' }
                 ],
                 doors: [
-                    { x: 450, y: 50, width: 35, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 515, y: 50, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                    { x: 450, y: 70, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 515, y: 70, width: 35, height: 50, type: 'water', color: '#3742fa' }
                 ],
                 switches: [
                     { x: 60, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 200, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 330, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 460, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 590, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 720, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 880, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                    { x: 210, y: 460, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 570, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
                 ]
             },
-            // Level 11: The Gauntlet
+            
+            // Level 5: Split paths
             {
-                name: "Ultimate Gauntlet",
+                name: "Divided Paths",
                 platforms: [
-                    { x: 0, y: 550, width: 80, height: 50, color: '#8b4513' },
-                    { x: 120, y: 480, width: 60, height: 20, color: '#8b4513' },
-                    { x: 220, y: 400, width: 60, height: 20, color: '#8b4513' },
-                    { x: 320, y: 320, width: 60, height: 20, color: '#8b4513' },
-                    { x: 420, y: 240, width: 60, height: 20, color: '#8b4513' },
-                    { x: 520, y: 160, width: 60, height: 20, color: '#8b4513' },
-                    { x: 620, y: 240, width: 60, height: 20, color: '#8b4513' },
-                    { x: 720, y: 320, width: 60, height: 20, color: '#8b4513' },
-                    { x: 820, y: 400, width: 60, height: 20, color: '#8b4513' },
-                    { x: 920, y: 550, width: 80, height: 50, color: '#8b4513' }
+                    { x: 0, y: 550, width: 100, height: 50, color: '#8b4513' },
+                    { x: 150, y: 480, width: 50, height: 20, color: '#8b4513' },
+                    { x: 250, y: 420, width: 50, height: 20, color: '#8b4513' },
+                    { x: 350, y: 360, width: 50, height: 20, color: '#8b4513' },
+                    { x: 450, y: 300, width: 100, height: 20, color: '#8b4513' },
+                    { x: 600, y: 360, width: 50, height: 20, color: '#8b4513' },
+                    { x: 700, y: 420, width: 50, height: 20, color: '#8b4513' },
+                    { x: 800, y: 480, width: 50, height: 20, color: '#8b4513' },
+                    { x: 900, y: 550, width: 100, height: 50, color: '#8b4513' },
+                    { x: 400, y: 180, width: 200, height: 20, color: '#8b4513' }
                 ],
                 hazards: [
-                    { x: 90, y: 460, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 190, y: 380, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 290, y: 300, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 390, y: 220, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 490, y: 140, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 590, y: 220, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 690, y: 300, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 790, y: 380, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 890, y: 530, width: 20, height: 20, type: 'water', color: '#0074d9' }
+                    { x: 120, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 220, y: 460, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 320, y: 400, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 570, y: 400, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 670, y: 460, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 870, y: 530, width: 20, height: 20, type: 'water', color: '#0074d9' }
                 ],
                 doors: [
-                    { x: 930, y: 500, width: 35, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 965, y: 500, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                    { x: 450, y: 130, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 515, y: 130, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 380, y: 340, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 630, y: 340, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            
+            // Level 6: Mirror maze
+            {
+                name: "Mirror Paths",
+                platforms: [
+                    { x: 0, y: 550, width: 80, height: 50, color: '#8b4513' },
+                    { x: 130, y: 480, width: 60, height: 20, color: '#8b4513' },
+                    { x: 240, y: 420, width: 60, height: 20, color: '#8b4513' },
+                    { x: 350, y: 360, width: 60, height: 20, color: '#8b4513' },
+                    { x: 460, y: 300, width: 80, height: 20, color: '#8b4513' },
+                    { x: 590, y: 360, width: 60, height: 20, color: '#8b4513' },
+                    { x: 700, y: 420, width: 60, height: 20, color: '#8b4513' },
+                    { x: 810, y: 480, width: 60, height: 20, color: '#8b4513' },
+                    { x: 920, y: 550, width: 80, height: 50, color: '#8b4513' },
+                    { x: 400, y: 180, width: 200, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 100, y: 530, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 210, y: 460, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 320, y: 400, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 560, y: 400, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 670, y: 460, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 880, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' }
+                ],
+                doors: [
+                    { x: 450, y: 130, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 515, y: 130, width: 35, height: 50, type: 'water', color: '#3742fa' }
                 ],
                 switches: [
                     { x: 40, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 150, y: 460, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 250, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 350, y: 300, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 450, y: 220, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 550, y: 140, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                    { x: 960, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 490, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 510, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
                 ]
             },
-            // Level 12: Chamber of Cooperation
+            
+            // Level 7: Tower climb
             {
-                name: "Cooperation Chambers",
+                name: "Spiral Tower",
                 platforms: [
-                    { x: 0, y: 550, width: 100, height: 50, color: '#8b4513' },
-                    { x: 150, y: 450, width: 50, height: 100, color: '#8b4513' },
-                    { x: 250, y: 350, width: 50, height: 200, color: '#8b4513' },
-                    { x: 350, y: 400, width: 300, height: 20, color: '#8b4513' },
-                    { x: 700, y: 350, width: 50, height: 200, color: '#8b4513' },
-                    { x: 800, y: 450, width: 50, height: 100, color: '#8b4513' },
-                    { x: 900, y: 550, width: 100, height: 50, color: '#8b4513' },
-                    { x: 400, y: 250, width: 200, height: 20, color: '#8b4513' },
-                    { x: 450, y: 150, width: 100, height: 20, color: '#8b4513' }
+                    { x: 0, y: 550, width: 150, height: 50, color: '#8b4513' },
+                    { x: 200, y: 480, width: 80, height: 20, color: '#8b4513' },
+                    { x: 330, y: 420, width: 80, height: 20, color: '#8b4513' },
+                    { x: 460, y: 360, width: 80, height: 20, color: '#8b4513' },
+                    { x: 590, y: 300, width: 80, height: 20, color: '#8b4513' },
+                    { x: 720, y: 240, width: 80, height: 20, color: '#8b4513' },
+                    { x: 580, y: 180, width: 80, height: 20, color: '#8b4513' },
+                    { x: 440, y: 120, width: 80, height: 20, color: '#8b4513' },
+                    { x: 400, y: 60, width: 200, height: 20, color: '#8b4513' }
                 ],
                 hazards: [
-                    { x: 120, y: 530, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 220, y: 430, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 320, y: 380, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 670, y: 380, width: 20, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 770, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 870, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' }
+                    { x: 170, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 300, y: 460, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 430, y: 400, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 560, y: 340, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 690, y: 280, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 550, y: 220, width: 20, height: 20, type: 'water', color: '#0074d9' }
                 ],
                 doors: [
-                    { x: 470, y: 100, width: 35, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 495, y: 100, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                    { x: 450, y: 10, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 515, y: 10, width: 35, height: 50, type: 'water', color: '#3742fa' }
                 ],
                 switches: [
-                    { x: 50, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 175, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 275, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 430, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 570, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 725, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 825, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 950, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                    { x: 230, y: 460, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 490, y: 340, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 620, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 470, y: 100, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' }
                 ]
             },
-            // Level 13: The Elemental Crucible
+            
+            // Level 8: Hazard highway
             {
-                name: "Elemental Crucible",
+                name: "Dangerous Highway",
                 platforms: [
                     { x: 0, y: 550, width: 80, height: 50, color: '#8b4513' },
-                    { x: 120, y: 500, width: 40, height: 20, color: '#8b4513' },
-                    { x: 200, y: 450, width: 40, height: 20, color: '#8b4513' },
-                    { x: 280, y: 400, width: 40, height: 20, color: '#8b4513' },
-                    { x: 360, y: 350, width: 40, height: 20, color: '#8b4513' },
-                    { x: 440, y: 300, width: 120, height: 20, color: '#8b4513' },
-                    { x: 600, y: 350, width: 40, height: 20, color: '#8b4513' },
-                    { x: 680, y: 400, width: 40, height: 20, color: '#8b4513' },
-                    { x: 760, y: 450, width: 40, height: 20, color: '#8b4513' },
-                    { x: 840, y: 500, width: 40, height: 20, color: '#8b4513' },
+                    { x: 130, y: 480, width: 50, height: 20, color: '#8b4513' },
+                    { x: 230, y: 420, width: 50, height: 20, color: '#8b4513' },
+                    { x: 330, y: 360, width: 50, height: 20, color: '#8b4513' },
+                    { x: 430, y: 420, width: 50, height: 20, color: '#8b4513' },
+                    { x: 530, y: 480, width: 50, height: 20, color: '#8b4513' },
+                    { x: 630, y: 420, width: 50, height: 20, color: '#8b4513' },
+                    { x: 730, y: 360, width: 50, height: 20, color: '#8b4513' },
+                    { x: 830, y: 420, width: 50, height: 20, color: '#8b4513' },
                     { x: 920, y: 550, width: 80, height: 50, color: '#8b4513' },
-                    { x: 300, y: 200, width: 400, height: 20, color: '#8b4513' },
-                    { x: 450, y: 100, width: 100, height: 20, color: '#8b4513' }
+                    { x: 350, y: 240, width: 300, height: 20, color: '#8b4513' }
                 ],
                 hazards: [
-                    { x: 100, y: 480, width: 15, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 165, y: 480, width: 30, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 245, y: 430, width: 30, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 325, y: 380, width: 30, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 405, y: 330, width: 30, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 565, y: 330, width: 30, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 645, y: 380, width: 30, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 725, y: 430, width: 30, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 805, y: 480, width: 30, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 885, y: 480, width: 15, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 350, y: 180, width: 40, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 610, y: 180, width: 40, height: 20, type: 'water', color: '#0074d9' }
+                    { x: 100, y: 530, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 200, y: 460, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 300, y: 400, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 400, y: 460, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 500, y: 520, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 600, y: 460, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 700, y: 400, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 800, y: 460, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 900, y: 530, width: 20, height: 20, type: 'water', color: '#0074d9' }
                 ],
                 doors: [
-                    { x: 470, y: 50, width: 35, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 495, y: 50, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                    { x: 450, y: 190, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 515, y: 190, width: 35, height: 50, type: 'water', color: '#3742fa' }
                 ],
                 switches: [
-                    { x: 40, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 140, y: 480, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 220, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 380, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 520, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 620, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 780, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 860, y: 480, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 40, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 160, y: 460, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 360, y: 340, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 560, y: 460, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 760, y: 340, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
                     { x: 960, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
                 ]
             },
-            // Level 14: Trial of Elements
+            
+            // Level 9: Great divide
             {
-                name: "Trial of Elements",
+                name: "The Great Divide",
                 platforms: [
-                    { x: 0, y: 550, width: 60, height: 50, color: '#8b4513' },
-                    { x: 100, y: 500, width: 30, height: 20, color: '#8b4513' },
-                    { x: 170, y: 450, width: 30, height: 20, color: '#8b4513' },
-                    { x: 240, y: 400, width: 30, height: 20, color: '#8b4513' },
-                    { x: 310, y: 350, width: 30, height: 20, color: '#8b4513' },
-                    { x: 380, y: 300, width: 30, height: 20, color: '#8b4513' },
-                    { x: 450, y: 250, width: 100, height: 20, color: '#8b4513' },
-                    { x: 590, y: 300, width: 30, height: 20, color: '#8b4513' },
-                    { x: 660, y: 350, width: 30, height: 20, color: '#8b4513' },
-                    { x: 730, y: 400, width: 30, height: 20, color: '#8b4513' },
-                    { x: 800, y: 450, width: 30, height: 20, color: '#8b4513' },
-                    { x: 870, y: 500, width: 30, height: 20, color: '#8b4513' },
-                    { x: 940, y: 550, width: 60, height: 50, color: '#8b4513' },
-                    { x: 200, y: 200, width: 600, height: 20, color: '#8b4513' },
-                    { x: 350, y: 100, width: 300, height: 20, color: '#8b4513' },
-                    { x: 475, y: 50, width: 50, height: 20, color: '#8b4513' }
+                    { x: 0, y: 550, width: 120, height: 50, color: '#8b4513' },
+                    { x: 180, y: 450, width: 80, height: 150, color: '#8b4513' },
+                    { x: 320, y: 380, width: 60, height: 20, color: '#8b4513' },
+                    { x: 440, y: 320, width: 120, height: 20, color: '#8b4513' },
+                    { x: 620, y: 380, width: 60, height: 20, color: '#8b4513' },
+                    { x: 740, y: 450, width: 80, height: 150, color: '#8b4513' },
+                    { x: 880, y: 550, width: 120, height: 50, color: '#8b4513' },
+                    { x: 120, y: 280, width: 80, height: 20, color: '#8b4513' },
+                    { x: 800, y: 280, width: 80, height: 20, color: '#8b4513' },
+                    { x: 400, y: 180, width: 200, height: 20, color: '#8b4513' }
                 ],
                 hazards: [
-                    { x: 80, y: 480, width: 15, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 140, y: 480, width: 25, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 210, y: 430, width: 25, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 280, y: 380, width: 25, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 350, y: 330, width: 25, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 415, y: 280, width: 30, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 555, y: 280, width: 30, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 625, y: 330, width: 25, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 695, y: 380, width: 25, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 765, y: 430, width: 25, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 835, y: 480, width: 25, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 905, y: 480, width: 15, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 250, y: 180, width: 30, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 320, y: 180, width: 30, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 450, y: 180, width: 30, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 520, y: 180, width: 30, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 650, y: 180, width: 30, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 720, y: 180, width: 30, height: 20, type: 'water', color: '#0074d9' },
-                    { x: 400, y: 80, width: 40, height: 20, type: 'fire', color: '#ff4136' },
-                    { x: 560, y: 80, width: 40, height: 20, type: 'water', color: '#0074d9' }
+                    { x: 280, y: 580, width: 440, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 350, y: 360, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 590, y: 360, width: 30, height: 20, type: 'fire', color: '#ff4136' }
                 ],
                 doors: [
-                    { x: 485, y: 0, width: 20, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 495, y: 0, width: 20, height: 50, type: 'water', color: '#3742fa' }
+                    { x: 450, y: 130, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 515, y: 130, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 210, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 770, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 150, y: 260, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 830, y: 260, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' }
+                ]
+            },
+            
+            // Level 10: Switch symphony
+            {
+                name: "Switch Symphony",
+                platforms: [
+                    { x: 0, y: 550, width: 100, height: 50, color: '#8b4513' },
+                    { x: 150, y: 480, width: 60, height: 20, color: '#8b4513' },
+                    { x: 260, y: 420, width: 60, height: 20, color: '#8b4513' },
+                    { x: 370, y: 360, width: 60, height: 20, color: '#8b4513' },
+                    { x: 480, y: 300, width: 60, height: 20, color: '#8b4513' },
+                    { x: 590, y: 360, width: 60, height: 20, color: '#8b4513' },
+                    { x: 700, y: 420, width: 60, height: 20, color: '#8b4513' },
+                    { x: 810, y: 480, width: 60, height: 20, color: '#8b4513' },
+                    { x: 900, y: 550, width: 100, height: 50, color: '#8b4513' },
+                    { x: 400, y: 180, width: 200, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 120, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 230, y: 460, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 340, y: 400, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 450, y: 340, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 560, y: 400, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 670, y: 460, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 880, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' }
+                ],
+                doors: [
+                    { x: 450, y: 130, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 515, y: 130, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 50, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 180, y: 460, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 290, y: 400, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 400, y: 340, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 510, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 620, y: 340, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 730, y: 400, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 950, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' }
+                ]
+            },
+            // Level 11: The gauntlet
+            {
+                name: "Ultimate Gauntlet",
+                platforms: [
+                    { x: 0, y: 550, width: 60, height: 50, color: '#8b4513' },
+                    { x: 100, y: 500, width: 40, height: 20, color: '#8b4513' },
+                    { x: 180, y: 450, width: 40, height: 20, color: '#8b4513' },
+                    { x: 260, y: 400, width: 40, height: 20, color: '#8b4513' },
+                    { x: 340, y: 350, width: 40, height: 20, color: '#8b4513' },
+                    { x: 420, y: 300, width: 40, height: 20, color: '#8b4513' },
+                    { x: 500, y: 250, width: 40, height: 20, color: '#8b4513' },
+                    { x: 580, y: 300, width: 40, height: 20, color: '#8b4513' },
+                    { x: 660, y: 350, width: 40, height: 20, color: '#8b4513' },
+                    { x: 740, y: 400, width: 40, height: 20, color: '#8b4513' },
+                    { x: 820, y: 450, width: 40, height: 20, color: '#8b4513' },
+                    { x: 900, y: 500, width: 40, height: 20, color: '#8b4513' },
+                    { x: 940, y: 550, width: 60, height: 50, color: '#8b4513' },
+                    { x: 450, y: 150, width: 100, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 70, y: 480, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 150, y: 480, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 230, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 310, y: 380, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 390, y: 330, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 470, y: 280, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 550, y: 330, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 630, y: 380, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 710, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 790, y: 480, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 870, y: 480, width: 20, height: 20, type: 'water', color: '#0074d9' }
+                ],
+                doors: [
+                    { x: 475, y: 100, width: 25, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 500, y: 100, width: 25, height: 50, type: 'water', color: '#3742fa' }
                 ],
                 switches: [
                     { x: 30, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 110, y: 480, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 180, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 250, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 320, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 390, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 480, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 500, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 610, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 680, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 750, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 820, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 890, y: 480, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 120, y: 480, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 280, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 440, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 520, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 600, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 760, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
                     { x: 970, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
                 ]
             },
-            // Level 15: The Final Elemental Challenge
+            
+            // Level 12: Cooperation chambers
             {
+                name: "Cooperation Chambers",
                 platforms: [
-                    { x: 0, y: 550, width: 50, height: 50, color: '#8b4513' },
-                    { x: 80, y: 520, width: 25, height: 15, color: '#8b4513' },
-                    { x: 130, y: 490, width: 25, height: 15, color: '#8b4513' },
-                    { x: 180, y: 460, width: 25, height: 15, color: '#8b4513' },
-                    { x: 230, y: 430, width: 25, height: 15, color: '#8b4513' },
-                    { x: 280, y: 400, width: 25, height: 15, color: '#8b4513' },
-                    { x: 330, y: 370, width: 25, height: 15, color: '#8b4513' },
-                    { x: 380, y: 340, width: 25, height: 15, color: '#8b4513' },
-                    { x: 430, y: 310, width: 25, height: 15, color: '#8b4513' },
-                    { x: 480, y: 280, width: 40, height: 15, color: '#8b4513' },
-                    { x: 550, y: 310, width: 25, height: 15, color: '#8b4513' },
-                    { x: 600, y: 340, width: 25, height: 15, color: '#8b4513' },
-                    { x: 650, y: 370, width: 25, height: 15, color: '#8b4513' },
-                    { x: 700, y: 400, width: 25, height: 15, color: '#8b4513' },
-                    { x: 750, y: 430, width: 25, height: 15, color: '#8b4513' },
-                    { x: 800, y: 460, width: 25, height: 15, color: '#8b4513' },
-                    { x: 850, y: 490, width: 25, height: 15, color: '#8b4513' },
-                    { x: 900, y: 520, width: 25, height: 15, color: '#8b4513' },
-                    { x: 950, y: 550, width: 50, height: 50, color: '#8b4513' },
-                    { x: 200, y: 250, width: 600, height: 15, color: '#8b4513' },
-                    { x: 300, y: 150, width: 400, height: 15, color: '#8b4513' },
-                    { x: 400, y: 50, width: 200, height: 15, color: '#8b4513' },
-                    { x: 480, y: 0, width: 40, height: 15, color: '#8b4513' }
+                    { x: 0, y: 550, width: 80, height: 50, color: '#8b4513' },
+                    { x: 120, y: 480, width: 40, height: 70, color: '#8b4513' },
+                    { x: 200, y: 420, width: 40, height: 130, color: '#8b4513' },
+                    { x: 280, y: 380, width: 60, height: 20, color: '#8b4513' },
+                    { x: 380, y: 320, width: 240, height: 20, color: '#8b4513' },
+                    { x: 660, y: 380, width: 60, height: 20, color: '#8b4513' },
+                    { x: 760, y: 420, width: 40, height: 130, color: '#8b4513' },
+                    { x: 840, y: 480, width: 40, height: 70, color: '#8b4513' },
+                    { x: 920, y: 550, width: 80, height: 50, color: '#8b4513' },
+                    { x: 450, y: 220, width: 100, height: 20, color: '#8b4513' },
+                    { x: 475, y: 120, width: 50, height: 20, color: '#8b4513' }
                 ],
                 hazards: [
-                    { x: 60, y: 500, width: 15, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 110, y: 470, width: 15, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 160, y: 440, width: 15, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 210, y: 410, width: 15, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 260, y: 380, width: 15, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 310, y: 350, width: 15, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 360, y: 320, width: 15, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 410, y: 290, width: 15, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 465, y: 260, width: 15, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 505, y: 260, width: 15, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 530, y: 290, width: 15, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 580, y: 320, width: 15, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 630, y: 350, width: 15, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 680, y: 380, width: 15, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 730, y: 410, width: 15, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 780, y: 440, width: 15, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 830, y: 470, width: 15, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 880, y: 500, width: 15, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 925, y: 500, width: 15, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 250, y: 230, width: 20, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 300, y: 230, width: 20, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 380, y: 230, width: 20, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 430, y: 230, width: 20, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 520, y: 230, width: 20, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 570, y: 230, width: 20, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 650, y: 230, width: 20, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 700, y: 230, width: 20, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 350, y: 130, width: 25, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 420, y: 130, width: 25, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 500, y: 130, width: 25, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 580, y: 130, width: 25, height: 15, type: 'water', color: '#0074d9' },
-                    { x: 650, y: 130, width: 25, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 430, y: 30, width: 20, height: 15, type: 'fire', color: '#ff4136' },
-                    { x: 550, y: 30, width: 20, height: 15, type: 'water', color: '#0074d9' }
+                    { x: 100, y: 530, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 180, y: 460, width: 15, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 250, y: 400, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 350, y: 360, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 640, y: 360, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 730, y: 400, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 820, y: 460, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 900, y: 530, width: 15, height: 20, type: 'fire', color: '#ff4136' }
                 ],
                 doors: [
-                    { x: 490, y: -50, width: 15, height: 50, type: 'fire', color: '#ff4757' },
-                    { x: 505, y: -50, width: 15, height: 50, type: 'water', color: '#3742fa' }
+                    { x: 485, y: 70, width: 15, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 500, y: 70, width: 15, height: 50, type: 'water', color: '#3742fa' }
                 ],
                 switches: [
-                    { x: 25, y: 530, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 90, y: 500, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 140, y: 470, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 190, y: 440, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 240, y: 410, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 290, y: 380, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 340, y: 350, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 390, y: 320, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 440, y: 290, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 490, y: 260, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 505, y: 260, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 560, y: 290, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 610, y: 320, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 660, y: 350, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 710, y: 380, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 760, y: 410, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 810, y: 440, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 860, y: 470, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
-                    { x: 910, y: 500, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
-                    { x: 975, y: 530, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' }
+                    { x: 40, y: 530, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 140, y: 460, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 220, y: 400, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 310, y: 360, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 470, y: 300, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 515, y: 300, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 690, y: 360, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 780, y: 400, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 860, y: 460, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 960, y: 530, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            
+            // Level 13: Elemental crucible
+            {
+                name: "Elemental Crucible",
+                platforms: [
+                    { x: 0, y: 550, width: 60, height: 50, color: '#8b4513' },
+                    { x: 90, y: 500, width: 30, height: 20, color: '#8b4513' },
+                    { x: 150, y: 460, width: 30, height: 20, color: '#8b4513' },
+                    { x: 210, y: 420, width: 30, height: 20, color: '#8b4513' },
+                    { x: 270, y: 380, width: 30, height: 20, color: '#8b4513' },
+                    { x: 330, y: 340, width: 30, height: 20, color: '#8b4513' },
+                    { x: 390, y: 300, width: 60, height: 20, color: '#8b4513' },
+                    { x: 480, y: 260, width: 80, height: 20, color: '#8b4513' },
+                    { x: 590, y: 300, width: 60, height: 20, color: '#8b4513' },
+                    { x: 680, y: 340, width: 30, height: 20, color: '#8b4513' },
+                    { x: 740, y: 380, width: 30, height: 20, color: '#8b4513' },
+                    { x: 800, y: 420, width: 30, height: 20, color: '#8b4513' },
+                    { x: 860, y: 460, width: 30, height: 20, color: '#8b4513' },
+                    { x: 920, y: 500, width: 30, height: 20, color: '#8b4513' },
+                    { x: 970, y: 550, width: 30, height: 50, color: '#8b4513' },
+                    { x: 400, y: 180, width: 200, height: 20, color: '#8b4513' },
+                    { x: 475, y: 120, width: 50, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 70, y: 480, width: 15, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 130, y: 440, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 190, y: 400, width: 15, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 250, y: 360, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 310, y: 320, width: 15, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 370, y: 280, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 570, y: 280, width: 15, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 660, y: 320, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 720, y: 360, width: 15, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 780, y: 400, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 840, y: 440, width: 15, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 900, y: 480, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 430, y: 160, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 550, y: 160, width: 20, height: 20, type: 'water', color: '#0074d9' }
+                ],
+                doors: [
+                    { x: 485, y: 70, width: 15, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 500, y: 70, width: 15, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 30, y: 530, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 105, y: 480, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 165, y: 440, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 225, y: 400, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 285, y: 360, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 345, y: 320, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 415, y: 280, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 510, y: 240, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 525, y: 240, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 615, y: 280, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 695, y: 320, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 755, y: 360, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 815, y: 400, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 875, y: 440, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 935, y: 480, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            
+            // Level 14: Trial of elements
+            {
+                name: "Trial of Elements",
+                platforms: [
+                    { x: 0, y: 550, width: 50, height: 50, color: '#8b4513' },
+                    { x: 70, y: 520, width: 25, height: 20, color: '#8b4513' },
+                    { x: 115, y: 490, width: 25, height: 20, color: '#8b4513' },
+                    { x: 160, y: 460, width: 25, height: 20, color: '#8b4513' },
+                    { x: 205, y: 430, width: 25, height: 20, color: '#8b4513' },
+                    { x: 250, y: 400, width: 25, height: 20, color: '#8b4513' },
+                    { x: 295, y: 370, width: 25, height: 20, color: '#8b4513' },
+                    { x: 340, y: 340, width: 25, height: 20, color: '#8b4513' },
+                    { x: 385, y: 310, width: 25, height: 20, color: '#8b4513' },
+                    { x: 430, y: 280, width: 50, height: 20, color: '#8b4513' },
+                    { x: 500, y: 250, width: 80, height: 20, color: '#8b4513' },
+                    { x: 600, y: 280, width: 50, height: 20, color: '#8b4513' },
+                    { x: 670, y: 310, width: 25, height: 20, color: '#8b4513' },
+                    { x: 715, y: 340, width: 25, height: 20, color: '#8b4513' },
+                    { x: 760, y: 370, width: 25, height: 20, color: '#8b4513' },
+                    { x: 805, y: 400, width: 25, height: 20, color: '#8b4513' },
+                    { x: 850, y: 430, width: 25, height: 20, color: '#8b4513' },
+                    { x: 895, y: 460, width: 25, height: 20, color: '#8b4513' },
+                    { x: 940, y: 490, width: 25, height: 20, color: '#8b4513' },
+                    { x: 985, y: 520, width: 15, height: 20, color: '#8b4513' },
+                    { x: 350, y: 180, width: 300, height: 20, color: '#8b4513' },
+                    { x: 450, y: 120, width: 100, height: 20, color: '#8b4513' },
+                    { x: 485, y: 70, width: 30, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 55, y: 500, width: 10, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 100, y: 470, width: 10, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 145, y: 440, width: 10, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 190, y: 410, width: 10, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 235, y: 380, width: 10, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 280, y: 350, width: 10, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 325, y: 320, width: 10, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 370, y: 290, width: 10, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 415, y: 260, width: 10, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 485, y: 230, width: 10, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 565, y: 230, width: 10, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 655, y: 260, width: 10, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 700, y: 290, width: 10, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 745, y: 320, width: 10, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 790, y: 350, width: 10, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 835, y: 380, width: 10, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 880, y: 410, width: 10, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 925, y: 440, width: 10, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 970, y: 470, width: 10, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 380, y: 160, width: 15, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 425, y: 160, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 505, y: 160, width: 15, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 575, y: 160, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 620, y: 160, width: 15, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 470, y: 100, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 515, y: 100, width: 15, height: 20, type: 'fire', color: '#ff4136' }
+                ],
+                doors: [
+                    { x: 490, y: 20, width: 10, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 500, y: 20, width: 10, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 25, y: 530, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 85, y: 500, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 130, y: 470, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 175, y: 440, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 220, y: 410, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 265, y: 380, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 310, y: 350, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 355, y: 320, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 400, y: 290, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 450, y: 260, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 520, y: 230, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 540, y: 230, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 620, y: 260, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 685, y: 290, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 730, y: 320, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 775, y: 350, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 820, y: 380, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 865, y: 410, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 910, y: 440, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 955, y: 470, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            
+            // Level 15: Final challenge
+            {
+                name: "Final Challenge",
+                platforms: [
+                    { x: 0, y: 550, width: 40, height: 50, color: '#8b4513' },
+                    { x: 60, y: 520, width: 20, height: 15, color: '#8b4513' },
+                    { x: 100, y: 500, width: 20, height: 15, color: '#8b4513' },
+                    { x: 140, y: 480, width: 20, height: 15, color: '#8b4513' },
+                    { x: 180, y: 460, width: 20, height: 15, color: '#8b4513' },
+                    { x: 220, y: 440, width: 20, height: 15, color: '#8b4513' },
+                    { x: 260, y: 420, width: 20, height: 15, color: '#8b4513' },
+                    { x: 300, y: 400, width: 20, height: 15, color: '#8b4513' },
+                    { x: 340, y: 380, width: 20, height: 15, color: '#8b4513' },
+                    { x: 380, y: 360, width: 20, height: 15, color: '#8b4513' },
+                    { x: 420, y: 340, width: 20, height: 15, color: '#8b4513' },
+                    { x: 460, y: 320, width: 30, height: 15, color: '#8b4513' },
+                    { x: 510, y: 300, width: 40, height: 15, color: '#8b4513' },
+                    { x: 570, y: 320, width: 30, height: 15, color: '#8b4513' },
+                    { x: 620, y: 340, width: 20, height: 15, color: '#8b4513' },
+                    { x: 660, y: 360, width: 20, height: 15, color: '#8b4513' },
+                    { x: 700, y: 380, width: 20, height: 15, color: '#8b4513' },
+                    { x: 740, y: 400, width: 20, height: 15, color: '#8b4513' },
+                    { x: 780, y: 420, width: 20, height: 15, color: '#8b4513' },
+                    { x: 820, y: 440, width: 20, height: 15, color: '#8b4513' },
+                    { x: 860, y: 460, width: 20, height: 15, color: '#8b4513' },
+                    { x: 900, y: 480, width: 20, height: 15, color: '#8b4513' },
+                    { x: 940, y: 500, width: 20, height: 15, color: '#8b4513' },
+                    { x: 980, y: 520, width: 20, height: 15, color: '#8b4513' },
+                    { x: 960, y: 550, width: 40, height: 50, color: '#8b4513' },
+                    { x: 300, y: 250, width: 400, height: 15, color: '#8b4513' },
+                    { x: 400, y: 180, width: 200, height: 15, color: '#8b4513' },
+                    { x: 450, y: 120, width: 100, height: 15, color: '#8b4513' },
+                    { x: 485, y: 70, width: 30, height: 15, color: '#8b4513' },
+                    { x: 495, y: 30, width: 10, height: 15, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 45, y: 500, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 85, y: 480, width: 10, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 125, y: 460, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 165, y: 440, width: 10, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 205, y: 420, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 245, y: 400, width: 10, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 285, y: 380, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 325, y: 360, width: 10, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 365, y: 340, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 405, y: 320, width: 10, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 445, y: 300, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 495, y: 280, width: 10, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 535, y: 280, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 555, y: 300, width: 10, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 605, y: 320, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 645, y: 340, width: 10, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 685, y: 360, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 725, y: 380, width: 10, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 765, y: 400, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 805, y: 420, width: 10, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 845, y: 440, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 885, y: 460, width: 10, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 925, y: 480, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 965, y: 500, width: 10, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 330, y: 230, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 370, y: 230, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 430, y: 230, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 490, y: 230, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 550, y: 230, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 610, y: 230, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 655, y: 230, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 420, y: 160, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 465, y: 160, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 520, y: 160, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 565, y: 160, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 470, y: 100, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 515, y: 100, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 475, y: 50, width: 10, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 520, y: 50, width: 10, height: 15, type: 'water', color: '#0074d9' }
+                ],
+                doors: [
+                    { x: 497, y: -20, width: 6, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 497, y: -20, width: 6, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 20, y: 530, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 70, y: 500, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 110, y: 480, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 150, y: 460, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 190, y: 440, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 230, y: 420, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 270, y: 400, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 310, y: 380, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 350, y: 360, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 390, y: 340, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 430, y: 320, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 470, y: 300, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 520, y: 280, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 530, y: 280, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 580, y: 300, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 630, y: 320, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 670, y: 340, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 710, y: 360, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 750, y: 380, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 790, y: 400, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 830, y: 420, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 870, y: 440, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 910, y: 460, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 950, y: 480, width: 10, height: 10, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 980, y: 500, width: 10, height: 10, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
                 ]
             }
-        ];
+        ];   
       
       let currentLevelData = levels[currentLevel - 1];
 
@@ -956,9 +1055,11 @@
             showStatus('Connecting to server...');
             
             socket = io({
-                transports: ['websocket', 'polling'],
-                timeout: 20000,
-                forceNew: true
+                transports: ['websocket'], // WebSocket only for best performance
+                timeout: 10000,
+                forceNew: true,
+                upgrade: false, // Don't try to upgrade transport
+                compression: false // Disable compression for speed
             });
 
             socket.on('connect', () => {
@@ -1022,12 +1123,11 @@
                 }
             });
 
-            // IMPROVED INPUT HANDLING - Forward inputs immediately
+            // IMPROVED: Receive inputs and apply immediately
             socket.on('playerInput', (data) => {
                 if (data.playerType !== myPlayerType) {
-                    // Apply input to other player immediately
+                    // Apply input to other player instantly for zero-lag feel
                     otherPlayer.keys = { ...data.keys };
-                    otherPlayer.lastUpdateTime = Date.now();
                 }
             });
 
@@ -1131,14 +1231,16 @@
         }
 
         function startGame() {
-            console.log('🎮 Starting game...');
+            console.log('🎮 Starting ultra-smooth game...');
             document.getElementById('connectionScreen').style.display = 'none';
             document.getElementById('gameScreen').style.display = 'flex';
             document.getElementById('networkInfo').style.display = 'block';
             gameInitialized = true;
             
             resetLevel();
-            gameLoop();
+            
+            // Start the game loop with proper timing
+            requestAnimationFrame(gameLoop);
         }
 
         function startPingMonitoring() {
@@ -1153,39 +1255,44 @@
         // Removed complex reconciliation - now using pure client authority
         // Each client is authoritative over their own player movement
 
-        // SIMPLIFIED INPUT HANDLING - Direct and reliable
+        // ULTRA-OPTIMIZED INPUT HANDLING - Immediate response, smart sending
         const keys = {};
+        let inputChanged = false;
 
         document.addEventListener('keydown', (e) => {
             if (!gameInitialized || !myPlayerType) return;
             
             const key = e.key.toLowerCase();
+            if (keys[key]) return; // Already pressed, ignore repeat
+            
             keys[key] = true;
             
             if ((myPlayerType === 'fire' && ['w', 'a', 's', 'd'].includes(key)) ||
                 (myPlayerType === 'water' && ['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key))) {
                 e.preventDefault();
+                inputChanged = true;
+                updateMyPlayerInput();
             }
-            
-            updateMyPlayerInput();
         });
 
         document.addEventListener('keyup', (e) => {
             if (!gameInitialized || !myPlayerType) return;
             
             const key = e.key.toLowerCase();
+            if (!keys[key]) return; // Already released, ignore
+            
             keys[key] = false;
             
             if ((myPlayerType === 'fire' && ['w', 'a', 's', 'd'].includes(key)) ||
                 (myPlayerType === 'water' && ['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key))) {
                 e.preventDefault();
+                inputChanged = true;
+                updateMyPlayerInput();
             }
-            
-            updateMyPlayerInput();
         });
 
         function updateMyPlayerInput() {
-            // Update player keys directly
+            // Update player keys immediately - no delay
             if (myPlayerType === 'fire') {
                 myPlayer.keys.left = keys['a'] || false;
                 myPlayer.keys.right = keys['d'] || false;
@@ -1195,29 +1302,16 @@
                 myPlayer.keys.right = keys['arrowright'] || false;
                 myPlayer.keys.up = keys['arrowup'] || false;
             }
-            
-            // Send to server with simple throttling
-            const now = Date.now();
-            if (now - lastInputSent > 50) {
-                lastInputSent = now;
-                sendInputToServer();
-            }
         }
 
+        // OPTIMIZED: Send inputs only when they change, but immediately
         function sendInputToServer() {
-            if (socket && socket.connected) {
-                sequenceNumber++;
+            if (inputChanged && socket && socket.connected) {
+                inputChanged = false;
                 const inputData = {
                     keys: { ...myPlayer.keys },
-                    sequenceNumber: sequenceNumber,
                     timestamp: Date.now()
                 };
-                
-                // Store for reconciliation (simplified)
-                inputBuffer.push(inputData);
-                if (inputBuffer.length > 60) {
-                    inputBuffer.shift(); // Keep only recent inputs
-                }
                 
                 socket.emit('playerInput', inputData);
             }
@@ -1475,19 +1569,18 @@
             // Removed interpolation - position updates come directly from server
         }
 
-        // MUCH LESS FREQUENT POSITION SENDING - Only for sync, not control
+        // MINIMAL POSITION SENDING - Only for major corrections
         let positionSendCounter = 0;
         function sendMyPosition() {
             positionSendCounter++;
-            if (positionSendCounter >= 10) { // Send every 10 frames (~6fps) - much less frequent
+            if (positionSendCounter >= 20) { // Send every 20 frames (~3fps) - very minimal
                 positionSendCounter = 0;
                 if (socket && socket.connected) {
                     socket.emit('playerPosition', {
-                        x: myPlayer.x,
-                        y: myPlayer.y,
-                        velX: myPlayer.velX,
-                        velY: myPlayer.velY,
-                        timestamp: Date.now()
+                        x: Math.round(myPlayer.x), // Round to reduce data
+                        y: Math.round(myPlayer.y),
+                        velX: Math.round(myPlayer.velX * 10) / 10, // One decimal
+                        velY: Math.round(myPlayer.velY * 10) / 10
                     });
                 }
             }
@@ -1619,30 +1712,32 @@
             }
         }
 
-        // OPTIMIZED GAME LOOP WITH FPS MONITORING
-        function gameLoop() {
+        // SUPER OPTIMIZED GAME LOOP - Higher performance
+        let lastTime = 0;
+        function gameLoop(currentTime) {
             if (!gameInitialized) return;
             
-            // FPS calculation
-            const currentTime = performance.now();
-            const deltaTime = currentTime - lastFrameTime;
-            frameCount++;
+            // Calculate delta time for smooth animation
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
             
-            if (frameCount >= 60) {
-                fps = Math.round(1000 / (deltaTime));
+            // FPS calculation (less frequent)
+            frameCount++;
+            if (frameCount >= 120) { // Update every 2 seconds
+                fps = Math.round(1000 / deltaTime);
                 document.getElementById('fpsValue').textContent = fps;
                 frameCount = 0;
             }
-            lastFrameTime = currentTime;
             
             if (gameState === 'playing') {
-                // Update my player with client-side prediction
+                // Update players
                 updateMyPlayer();
-                
-                // Update other player with interpolation
                 updateOtherPlayer();
                 
-                // Send position to server (throttled)
+                // Send input changes immediately (only when changed)
+                sendInputToServer();
+                
+                // Send position updates very sparingly
                 sendMyPosition();
                 
                 checkWinCondition();

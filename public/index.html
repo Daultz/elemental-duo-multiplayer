@@ -337,7 +337,7 @@
             // Prediction data
             serverX: 100, serverY: 522, serverVelX: 0, serverVelY: 0,
             lastServerUpdate: 0
-        };
+        };  
 
         // Complete levels data - All 15 levels with progressive difficulty
         const levels = [
@@ -906,9 +906,10 @@
                 ]
             }
         ];
+        
         let currentLevelData = levels[currentLevel - 1];
 
-        // Connection functions
+        // Connection functions with improved error handling
         function createRoom() {
             const playerName = document.getElementById('playerName').value.trim();
             if (!playerName) {
@@ -918,53 +919,100 @@
             
             const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
             document.getElementById('roomId').value = roomId;
+            showStatus(`Creating room ${roomId}...`);
             joinGame();
         }
 
         function joinGame() {
             const playerName = document.getElementById('playerName').value.trim();
-            const roomId = document.getElementById('roomId').value.trim();
+            const roomId = document.getElementById('roomId').value.trim().toUpperCase();
             
             if (!playerName || !roomId) {
                 showStatus('Please enter both your name and room ID!');
                 return;
             }
 
+            // Prevent multiple connections
+            if (socket && socket.connected) {
+                socket.disconnect();
+            }
+
             showStatus('Connecting to server...');
             
-            socket = io();
+            // Initialize socket with better error handling
+            socket = io({
+                transports: ['websocket', 'polling'],
+                timeout: 20000,
+                forceNew: true
+            });
+
+            // Connection timeout
+            const connectionTimeout = setTimeout(() => {
+                if (!socket.connected) {
+                    showStatus('❌ Connection timeout. Please try again or check your internet connection.');
+                    if (socket) socket.disconnect();
+                }
+            }, 15000);
             
             socket.on('connect', () => {
-                console.log('🔌 Connected to server');
-                socket.emit('joinRoom', { roomId, playerName });
+                clearTimeout(connectionTimeout);
+                console.log('🔌 Connected to server with ID:', socket.id);
+                showStatus('Connected! Joining room...');
+                socket.emit('joinRoom', { roomId: roomId, playerName: playerName });
+            });
+
+            socket.on('connect_error', (error) => {
+                clearTimeout(connectionTimeout);
+                console.error('Connection error:', error);
+                showStatus('❌ Failed to connect to server. Please refresh and try again.');
             });
 
             socket.on('playerAssigned', (data) => {
                 myPlayerType = data.playerType;
                 console.log(`🎮 Assigned as ${data.playerType} player in room ${data.roomId}`);
-                showStatus(`You are the ${data.playerType} player! ${data.playersCount === 2 ? 'Starting game...' : 'Waiting for partner...'}`);
                 
-                if (data.playersCount === 2) {
-                    setTimeout(startGame, 1000);
-                }
+                const statusMsg = data.playersCount === 2 
+                    ? `You are the ${data.playerType} player! Starting game...`
+                    : `You are the ${data.playerType} player! Waiting for partner... (Share room ID: ${data.roomId})`;
+                    
+                showStatus(statusMsg);
                 
                 updatePlayerIndicator(data);
+                
+                if (data.playersCount === 2) {
+                    setTimeout(startGame, 1500);
+                }
             });
 
             socket.on('playerJoined', (data) => {
                 console.log(`🤝 ${data.playerType} player joined. Total players: ${data.playersCount}`);
                 showStatus('Partner joined! Starting game...');
-                setTimeout(startGame, 1000);
+                setTimeout(startGame, 1500);
             });
 
             socket.on('roomFull', () => {
                 console.log('❌ Room full error received');
-                showStatus('Room is full! Try a different room ID.');
-                socket.disconnect();
+                showStatus('❌ Room is full! Try a different room ID.');
+                setTimeout(() => {
+                    if (socket) socket.disconnect();
+                }, 2000);
+            });
+
+            socket.on('error', (error) => {
+                console.error('Socket error:', error);
+                showStatus('❌ An error occurred: ' + (error.message || 'Unknown error'));
             });
 
             socket.on('playerLeft', (data) => {
+                console.log('Player left:', data);
                 showStatus(`😞 ${data.playerType} player left the game. Waiting for new partner...`);
+                
+                // Hide game screen and show connection screen
+                if (gameInitialized) {
+                    document.getElementById('gameScreen').style.display = 'none';
+                    document.getElementById('connectionScreen').style.display = 'flex';
+                    gameInitialized = false;
+                }
             });
 
             // Improved: Only receive input from other player with interpolation
@@ -996,13 +1044,23 @@
                 gameState = 'playing';
             });
 
-            socket.on('disconnect', () => {
+            socket.on('disconnect', (reason) => {
+                console.log('🔌 Disconnected from server. Reason:', reason);
                 showStatus('🔌 Disconnected from server. Refresh to reconnect.');
+                
+                // Reset game state
+                if (gameInitialized) {
+                    document.getElementById('gameScreen').style.display = 'none';
+                    document.getElementById('connectionScreen').style.display = 'flex';
+                    gameInitialized = false;
+                }
             });
         }
 
         function showStatus(message) {
-            document.getElementById('statusMessage').textContent = message;
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.textContent = message;
+            console.log('Status:', message);
         }
 
         function updatePlayerIndicator(data) {
@@ -1010,17 +1068,27 @@
             document.getElementById('roomInfo').innerHTML = `Room: ${data.roomId}<br>Players: ${data.playersCount}/2`;
             document.getElementById('playerIndicator').style.display = 'block';
             
+            // Update controls highlighting
+            document.getElementById('fireControls').classList.remove('my-controls');
+            document.getElementById('waterControls').classList.remove('my-controls');
+            
             if (myPlayerType === 'fire') {
                 document.getElementById('fireControls').classList.add('my-controls');
-            } else {
+            } else if (myPlayerType === 'water') {
                 document.getElementById('waterControls').classList.add('my-controls');
             }
         }
 
         function startGame() {
+            console.log('🎮 Starting game...');
             document.getElementById('connectionScreen').style.display = 'none';
             document.getElementById('gameScreen').style.display = 'flex';
             gameInitialized = true;
+            
+            // Reset player positions
+            resetLevel();
+            
+            // Start the game loop
             gameLoop();
         }
 

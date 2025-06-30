@@ -111,28 +111,51 @@ io.on('connection', (socket) => {
         socket.disconnect();
     }, 300000); // 5 minute timeout
 
-    // Join or create room
+    // Join or create room with better validation and logging
     socket.on('joinRoom', (data) => {
         try {
             const { roomId, playerName } = data;
             
-            if (!roomId || !playerName) {
+            // Validate input
+            if (!roomId || !playerName || typeof roomId !== 'string' || typeof playerName !== 'string') {
+                console.log(`❌ Invalid data from ${socket.id}:`, data);
                 socket.emit('error', { message: 'Invalid room ID or player name' });
                 return;
             }
             
-            let room = gameRooms.get(roomId);
+            // Clean the room ID (uppercase, alphanumeric only)
+            const cleanRoomId = roomId.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const cleanPlayerName = playerName.trim().substring(0, 20); // Limit length
+            
+            if (cleanRoomId.length < 3) {
+                socket.emit('error', { message: 'Room ID must be at least 3 characters' });
+                return;
+            }
+            
+            console.log(`🎯 Player ${socket.id} (${cleanPlayerName}) attempting to join room: ${cleanRoomId}`);
+            
+            let room = gameRooms.get(cleanRoomId);
 
             if (!room) {
-                room = new GameRoom(roomId);
-                gameRooms.set(roomId, room);
-                console.log(`🏠 Created new room: ${roomId}`);
+                room = new GameRoom(cleanRoomId);
+                gameRooms.set(cleanRoomId, room);
+                console.log(`🏠 Created new room: ${cleanRoomId}`);
             }
 
             if (room.isFull()) {
-                console.log(`❌ Room ${roomId} is full`);
+                console.log(`❌ Room ${cleanRoomId} is full (${room.players.size}/2)`);
                 socket.emit('roomFull');
                 return;
+            }
+
+            // Check if player is already in a room
+            if (socket.roomId) {
+                console.log(`🔄 Player ${socket.id} leaving previous room: ${socket.roomId}`);
+                socket.leave(socket.roomId);
+                const oldRoom = gameRooms.get(socket.roomId);
+                if (oldRoom) {
+                    oldRoom.removePlayer(socket.id);
+                }
             }
 
             // Assign player type based on availability
@@ -142,34 +165,39 @@ io.on('connection', (socket) => {
             } else if (!room.hasPlayerType('water')) {
                 playerType = 'water';
             } else {
+                console.log(`❌ Room ${cleanRoomId} is somehow full but wasn't detected earlier`);
                 socket.emit('roomFull');
                 return;
             }
 
             // Add player to room
             room.addPlayer(socket, playerType);
-            socket.join(roomId);
-            socket.roomId = roomId;
+            socket.join(cleanRoomId);
+            socket.roomId = cleanRoomId;
             socket.playerType = playerType;
-            socket.playerName = playerName;
+            socket.playerName = cleanPlayerName;
 
-            console.log(`🎮 ${playerName} (${playerType}) joined room ${roomId} (${room.players.size}/2)`);
+            console.log(`✅ ${cleanPlayerName} (${playerType}) successfully joined room ${cleanRoomId} (${room.players.size}/2)`);
 
+            // Send confirmation to the joining player
             socket.emit('playerAssigned', {
                 playerType: playerType,
-                roomId: roomId,
-                playersCount: room.players.size
+                roomId: cleanRoomId,
+                playersCount: room.players.size,
+                playerName: cleanPlayerName
             });
 
-            // Notify other players
+            // Notify other players in the room
             room.broadcastToRoom('playerJoined', {
                 playerType: playerType,
                 playersCount: room.players.size,
-                playerName: playerName
+                playerName: cleanPlayerName,
+                roomId: cleanRoomId
             }, socket);
+            
         } catch (error) {
-            console.error('Error in joinRoom:', error);
-            socket.emit('error', { message: 'Failed to join room' });
+            console.error('❌ Error in joinRoom:', error);
+            socket.emit('error', { message: 'Failed to join room. Please try again.' });
         }
     });
 

@@ -201,7 +201,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Optimized input forwarding - Core multiplayer functionality
+    // Optimized input forwarding with better throttling
     socket.on('playerInput', (keys) => {
         try {
             if (!socket.roomId || !socket.playerType) return;
@@ -209,12 +209,34 @@ io.on('connection', (socket) => {
             const room = gameRooms.get(socket.roomId);
             if (!room) return;
             
-            // Use room's throttled forwarding system
-            room.forwardInput(socket, {
-                playerType: socket.playerType,
-                keys: keys,
-                timestamp: Date.now()
-            });
+            // Enhanced throttling and validation
+            const now = Date.now();
+            const lastUpdate = room.lastInputUpdate.get(socket.id) || 0;
+            
+            // Throttle to max 15 updates per second per player (reduced from 20)
+            if (now - lastUpdate < 67) {
+                return false; // Skip this update
+            }
+            
+            // Validate input structure
+            if (!keys || typeof keys !== 'object') {
+                return false;
+            }
+            
+            room.lastInputUpdate.set(socket.id, now);
+            
+            // Forward to other players with player identification
+            for (let player of room.players.values()) {
+                if (player.socket !== socket) {
+                    player.socket.emit('playerInput', {
+                        playerType: socket.playerType,
+                        keys: keys,
+                        timestamp: now
+                    });
+                }
+            }
+            
+            return true;
         } catch (error) {
             console.error('Error forwarding input:', error);
         }

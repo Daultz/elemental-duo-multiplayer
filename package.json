@@ -1,0 +1,29 @@
+{
+  "name": "elemental-duo-multiplayer",
+  "version": "1.0.0",
+  "description": "Online multiplayer version of Elemental Duo cooperative puzzle game",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "multiplayer",
+    "game",
+    "cooperative",
+    "puzzle",
+    "websockets"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

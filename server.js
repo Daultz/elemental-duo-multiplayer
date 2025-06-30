@@ -1,5 +1,5 @@
-// server.js - Elemental Duo Multiplayer Server v2.1
-// Optimized for ultra-smooth multiplayer gaming with reduced lag
+// server.js - Elemental Duo Multiplayer Server v3.0
+// Optimized for ultra-smooth multiplayer gaming with client-side prediction
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -23,16 +23,18 @@ const io = socketIo(server, {
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Game rooms storage - Ultra-lightweight approach
+// Game rooms storage with improved state management
 const gameRooms = new Map();
 
 class GameRoom {
     constructor(roomId) {
         this.roomId = roomId;
         this.players = new Map();
+        this.playerStates = new Map(); // Server-side player states
         this.currentLevel = 1;
         this.createdAt = new Date();
-        this.lastInputUpdate = new Map(); // Track last input per player
+        this.lastUpdate = new Map(); // Track last update per player
+        this.gameState = 'waiting'; // waiting, playing, complete
     }
 
     addPlayer(socket, playerType) {
@@ -42,12 +44,32 @@ class GameRoom {
             joinedAt: new Date(),
             lastSeen: Date.now()
         });
-        this.lastInputUpdate.set(socket.id, 0);
+        
+        // Initialize player state
+        this.playerStates.set(socket.id, {
+            x: playerType === 'fire' ? 50 : 100,
+            y: 522,
+            velX: 0,
+            velY: 0,
+            timestamp: Date.now(),
+            sequenceNumber: 0
+        });
+        
+        this.lastUpdate.set(socket.id, 0);
+        
+        if (this.players.size === 2) {
+            this.gameState = 'playing';
+        }
     }
 
     removePlayer(socketId) {
         this.players.delete(socketId);
-        this.lastInputUpdate.delete(socketId);
+        this.playerStates.delete(socketId);
+        this.lastUpdate.delete(socketId);
+        
+        if (this.players.size < 2) {
+            this.gameState = 'waiting';
+        }
     }
 
     isFull() {
@@ -69,22 +91,84 @@ class GameRoom {
         }
     }
 
-    // Improved input forwarding with throttling
-    forwardInput(fromSocket, inputData) {
+    // Improved position validation and update
+    updatePlayerPosition(socketId, positionData) {
         const now = Date.now();
-        const lastUpdate = this.lastInputUpdate.get(fromSocket.id) || 0;
+        const lastUpdate = this.lastUpdate.get(socketId) || 0;
         
-        // Throttle to max 20 updates per second per player
-        if (now - lastUpdate < 50) {
+        // Rate limit to 15 updates per second per player
+        if (now - lastUpdate < 67) {
             return false; // Skip this update
         }
         
-        this.lastInputUpdate.set(fromSocket.id, now);
+        // Validate position bounds
+        const x = Math.max(0, Math.min(1000 - 28, positionData.x || 0));
+        const y = Math.max(0, Math.min(600, positionData.y || 0));
+        const velX = Math.max(-12, Math.min(12, positionData.velX || 0));
+        const velY = Math.max(-20, Math.min(20, positionData.velY || 0));
         
-        // Forward to other players only
-        for (let player of this.players.values()) {
-            if (player.socket !== fromSocket) {
-                player.socket.emit('playerInput', inputData);
+        // Update server state
+        this.playerStates.set(socketId, {
+            x: x,
+            y: y,
+            velX: velX,
+            velY: velY,
+            timestamp: now,
+            sequenceNumber: positionData.sequenceNumber || 0
+        });
+        
+        this.lastUpdate.set(socketId, now);
+        
+        // Get player info
+        const player = this.players.get(socketId);
+        if (!player) return false;
+        
+        // Forward to other players with validation
+        const updateData = {
+            playerType: player.playerType,
+            x: x,
+            y: y,
+            velX: velX,
+            velY: velY,
+            timestamp: now,
+            sequenceNumber: positionData.sequenceNumber || 0
+        };
+        
+        for (let [otherId, otherPlayer] of this.players.entries()) {
+            if (otherId !== socketId) {
+                otherPlayer.socket.emit('playerPosition', updateData);
+            }
+        }
+        
+        return true;
+    }
+
+    // Input-based movement for better prediction
+    processPlayerInput(socketId, inputData) {
+        const now = Date.now();
+        const lastUpdate = this.lastUpdate.get(socketId) || 0;
+        
+        // Rate limit inputs
+        if (now - lastUpdate < 50) {
+            return false;
+        }
+        
+        this.lastUpdate.set(socketId, now);
+        
+        const player = this.players.get(socketId);
+        if (!player) return false;
+        
+        // Forward input to other players for immediate response
+        const forwardData = {
+            playerType: player.playerType,
+            keys: inputData.keys,
+            timestamp: now,
+            sequenceNumber: inputData.sequenceNumber || 0
+        };
+        
+        for (let [otherId, otherPlayer] of this.players.entries()) {
+            if (otherId !== socketId) {
+                otherPlayer.socket.emit('playerInput', forwardData);
             }
         }
         
@@ -96,12 +180,13 @@ class GameRoom {
             roomId: this.roomId,
             playerCount: this.players.size,
             currentLevel: this.currentLevel,
+            gameState: this.gameState,
             uptime: Date.now() - this.createdAt.getTime()
         };
     }
 }
 
-// Socket.io connection handling with improved error handling
+// Socket.io connection handling
 io.on('connection', (socket) => {
     console.log(`🔌 Player connected: ${socket.id}`);
     
@@ -111,7 +196,7 @@ io.on('connection', (socket) => {
         socket.disconnect();
     }, 300000); // 5 minute timeout
 
-    // Join or create room with better validation and logging
+    // Join or create room
     socket.on('joinRoom', (data) => {
         try {
             const { roomId, playerName } = data;
@@ -123,9 +208,9 @@ io.on('connection', (socket) => {
                 return;
             }
             
-            // Clean the room ID (uppercase, alphanumeric only)
+            // Clean the room ID
             const cleanRoomId = roomId.toUpperCase().replace(/[^A-Z0-9]/g, '');
-            const cleanPlayerName = playerName.trim().substring(0, 20); // Limit length
+            const cleanPlayerName = playerName.trim().substring(0, 20);
             
             if (cleanRoomId.length < 3) {
                 socket.emit('error', { message: 'Room ID must be at least 3 characters' });
@@ -148,7 +233,7 @@ io.on('connection', (socket) => {
                 return;
             }
 
-            // Check if player is already in a room
+            // Leave previous room if any
             if (socket.roomId) {
                 console.log(`🔄 Player ${socket.id} leaving previous room: ${socket.roomId}`);
                 socket.leave(socket.roomId);
@@ -158,14 +243,14 @@ io.on('connection', (socket) => {
                 }
             }
 
-            // Assign player type based on availability
+            // Assign player type
             let playerType;
             if (!room.hasPlayerType('fire')) {
                 playerType = 'fire';
             } else if (!room.hasPlayerType('water')) {
                 playerType = 'water';
             } else {
-                console.log(`❌ Room ${cleanRoomId} is somehow full but wasn't detected earlier`);
+                console.log(`❌ Room ${cleanRoomId} assignment error`);
                 socket.emit('roomFull');
                 return;
             }
@@ -177,9 +262,9 @@ io.on('connection', (socket) => {
             socket.playerType = playerType;
             socket.playerName = cleanPlayerName;
 
-            console.log(`✅ ${cleanPlayerName} (${playerType}) successfully joined room ${cleanRoomId} (${room.players.size}/2)`);
+            console.log(`✅ ${cleanPlayerName} (${playerType}) joined room ${cleanRoomId} (${room.players.size}/2)`);
 
-            // Send confirmation to the joining player
+            // Send confirmation
             socket.emit('playerAssigned', {
                 playerType: playerType,
                 roomId: cleanRoomId,
@@ -187,7 +272,7 @@ io.on('connection', (socket) => {
                 playerName: cleanPlayerName
             });
 
-            // Notify other players in the room
+            // Notify other players
             room.broadcastToRoom('playerJoined', {
                 playerType: playerType,
                 playersCount: room.players.size,
@@ -201,7 +286,43 @@ io.on('connection', (socket) => {
         }
     });
 
-    // SIMPLIFIED: Direct position forwarding instead of input prediction
+    // SIMPLIFIED: Direct input forwarding for immediate response
+    socket.on('playerInput', (inputData) => {
+        try {
+            if (!socket.roomId || !socket.playerType) return;
+            
+            const room = gameRooms.get(socket.roomId);
+            if (!room) return;
+            
+            const now = Date.now();
+            const lastUpdate = room.lastUpdate.get(socket.id) || 0;
+            
+            // Simple rate limiting
+            if (now - lastUpdate < 50) {
+                return; // Skip this update
+            }
+            
+            room.lastUpdate.set(socket.id, now);
+            
+            // Forward input immediately to other players
+            const inputForward = {
+                playerType: socket.playerType,
+                keys: inputData.keys,
+                timestamp: now
+            };
+            
+            for (let [otherId, otherPlayer] of room.players.entries()) {
+                if (otherId !== socket.id) {
+                    otherPlayer.socket.emit('playerInput', inputForward);
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error processing input:', error);
+        }
+    });
+
+    // SIMPLIFIED: Direct position updates
     socket.on('playerPosition', (positionData) => {
         try {
             if (!socket.roomId || !socket.playerType) return;
@@ -209,38 +330,42 @@ io.on('connection', (socket) => {
             const room = gameRooms.get(socket.roomId);
             if (!room) return;
             
-            // Throttle position updates - max 20 per second
             const now = Date.now();
-            const lastUpdate = room.lastInputUpdate.get(socket.id) || 0;
+            const lastUpdate = room.lastUpdate.get(socket.id) || 0;
             
-            if (now - lastUpdate < 50) {
+            // Rate limit to 15 updates per second
+            if (now - lastUpdate < 67) {
                 return; // Skip this update
             }
             
-            room.lastInputUpdate.set(socket.id, now);
+            room.lastUpdate.set(socket.id, now);
             
-            // Forward position directly to other players
-            for (let player of room.players.values()) {
-                if (player.socket !== socket) {
-                    player.socket.emit('playerPosition', {
-                        playerType: socket.playerType,
-                        x: positionData.x,
-                        y: positionData.y,
-                        velX: positionData.velX,
-                        velY: positionData.velY
-                    });
+            // Basic validation
+            const x = Math.max(0, Math.min(972, positionData.x || 0)); // 1000 - 28 (player width)
+            const y = Math.max(0, Math.min(600, positionData.y || 0));
+            
+            // Forward to other players
+            const positionUpdate = {
+                playerType: socket.playerType,
+                x: x,
+                y: y,
+                velX: positionData.velX || 0,
+                velY: positionData.velY || 0,
+                timestamp: now
+            };
+            
+            for (let [otherId, otherPlayer] of room.players.entries()) {
+                if (otherId !== socket.id) {
+                    otherPlayer.socket.emit('playerPosition', positionUpdate);
                 }
             }
             
         } catch (error) {
-            console.error('Error forwarding position:', error);
+            console.error('Error updating position:', error);
         }
     });
 
-    // Remove the old playerInput handler - we don't need it anymore
-    // socket.on('playerInput', ...) - REMOVED
-
-    // Handle level events with validation
+    // Handle level events
     socket.on('levelComplete', () => {
         try {
             if (!socket.roomId) return;
@@ -249,6 +374,7 @@ io.on('connection', (socket) => {
             if (!room) return;
             
             console.log(`🎉 Level completed in room ${socket.roomId}`);
+            room.gameState = 'complete';
             room.broadcastToRoom('levelComplete', {}, socket);
         } catch (error) {
             console.error('Error in levelComplete:', error);
@@ -263,6 +389,7 @@ io.on('connection', (socket) => {
             if (!room) return;
             
             console.log(`🔄 Level restart in room ${socket.roomId}`);
+            room.gameState = 'playing';
             room.broadcastToRoom('restartLevel', {}, socket);
         } catch (error) {
             console.error('Error in restartLevel:', error);
@@ -277,6 +404,7 @@ io.on('connection', (socket) => {
             if (!room) return;
             
             room.currentLevel++;
+            room.gameState = 'playing';
             console.log(`⬆️ Advanced to level ${room.currentLevel} in room ${socket.roomId}`);
             room.broadcastToRoom('nextLevel', {}, socket);
         } catch (error) {
@@ -284,11 +412,10 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Handle disconnection with cleanup
+    // Handle disconnection
     socket.on('disconnect', (reason) => {
         console.log(`🔌 Player disconnected: ${socket.id}, reason: ${reason}`);
         
-        // Clear timeout
         if (socket.timeout) {
             clearTimeout(socket.timeout);
         }
@@ -305,7 +432,7 @@ io.on('connection', (socket) => {
                     playerName: socket.playerName
                 });
 
-                // Clean up empty rooms after a delay
+                // Clean up empty rooms
                 if (room.players.size === 0) {
                     setTimeout(() => {
                         const currentRoom = gameRooms.get(socket.roomId);
@@ -313,13 +440,13 @@ io.on('connection', (socket) => {
                             gameRooms.delete(socket.roomId);
                             console.log(`🗑️ Deleted empty room: ${socket.roomId}`);
                         }
-                    }, 5000); // 5 second delay to allow reconnection
+                    }, 5000);
                 }
             }
         }
     });
 
-    // Debug endpoint for room stats
+    // Debug endpoints
     socket.on('getRoomStats', () => {
         try {
             if (socket.roomId) {
@@ -333,7 +460,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Handle errors
     socket.on('error', (error) => {
         console.error(`Socket error for ${socket.id}:`, error);
     });
@@ -360,7 +486,7 @@ app.get('/stats', (req, res) => {
     res.json(stats);
 });
 
-// Cleanup stale rooms periodically
+// Cleanup stale rooms
 setInterval(() => {
     const now = Date.now();
     const staleThreshold = 10 * 60 * 1000; // 10 minutes
@@ -372,12 +498,22 @@ setInterval(() => {
             console.log(`🧹 Cleaned up stale room: ${roomId}`);
         }
     }
-}, 5 * 60 * 1000); // Run every 5 minutes
+}, 5 * 60 * 1000);
+
+// Server heartbeat for monitoring
+setInterval(() => {
+    const activeRooms = gameRooms.size;
+    const totalPlayers = Array.from(gameRooms.values()).reduce((sum, room) => sum + room.players.size, 0);
+    
+    if (activeRooms > 0) {
+        console.log(`💓 Server heartbeat: ${activeRooms} rooms, ${totalPlayers} players`);
+    }
+}, 30000); // Every 30 seconds
 
 // Start server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`🔥💧 Elemental Duo Server v2.1 running on port ${PORT}`);
+    console.log(`🔥💧 Elemental Duo Server v3.0 running on port ${PORT}`);
     console.log(`🌐 Ready for ultra-smooth multiplayer action!`);
     console.log(`📊 Health check: http://localhost:${PORT}/health`);
     console.log(`📈 Room stats: http://localhost:${PORT}/stats`);
@@ -387,7 +523,6 @@ server.listen(PORT, () => {
 process.on('SIGTERM', () => {
     console.log('🛑 Server shutting down gracefully...');
     
-    // Notify all connected players
     for (let room of gameRooms.values()) {
         room.broadcastToRoom('serverShutdown', {
             message: 'Server is restarting. Please refresh to reconnect.'

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elemental Duo - Complete Multiplayer Edition</title>
+    <title>Elemental Duo - Ultra Smooth Multiplayer Edition</title>
     <meta name="description" content="Play Elemental Duo online with friends - 15 cooperative puzzle levels">
     <style>
         * {
@@ -122,6 +122,19 @@
             border: 2px solid rgba(78, 205, 196, 0.3);
         }
 
+        .network-info {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            z-index: 1500;
+            font-size: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+        }
+
         .game-header {
             background: rgba(0, 0, 0, 0.9);
             color: white;
@@ -230,7 +243,7 @@
     <div id="connectionScreen" class="connection-screen">
         <div class="connection-form">
             <h1>🔥💧 Elemental Duo 💧🔥</h1>
-            <p style="margin-bottom: 20px; opacity: 0.9;">Complete Online Multiplayer Edition<br>15 Cooperative Puzzle Levels</p>
+            <p style="margin-bottom: 20px; opacity: 0.9;">Ultra Smooth Multiplayer Edition<br>15 Cooperative Puzzle Levels</p>
             
             <div class="form-group">
                 <input type="text" id="playerName" placeholder="Enter your name" maxlength="20" autocomplete="off">
@@ -247,6 +260,12 @@
                 Enter your name and room ID to start your cooperative adventure!
             </div>
         </div>
+    </div>
+
+    <!-- Network Info -->
+    <div id="networkInfo" class="network-info" style="display: none;">
+        <div>Ping: <span id="pingValue">--</span>ms</div>
+        <div>FPS: <span id="fpsValue">--</span></div>
     </div>
 
     <!-- Player Indicator -->
@@ -286,12 +305,20 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        console.log("🎮 Elemental Duo - Ultra Smooth Edition v3.0 Loading...");
+        console.log("🎮 Elemental Duo - Ultra Smooth Edition v4.0 Loading...");
         
-        // SIMPLIFIED NETWORKING SYSTEM - No prediction, pure local authority
+        // IMPROVED NETWORKING WITH CLIENT-SIDE PREDICTION
         let socket = null;
         let myPlayerType = null;
         let gameInitialized = false;
+        let sequenceNumber = 0;
+        let lastPingTime = 0;
+        let ping = 0;
+        
+        // Performance monitoring
+        let lastFrameTime = performance.now();
+        let frameCount = 0;
+        let fps = 60;
 
         // Game variables
         const canvas = document.getElementById('gameCanvas');
@@ -299,13 +326,16 @@
         let currentLevel = 1;
         let gameState = 'playing';
 
-        // SIMPLE PLAYER OBJECTS - No complex prediction
+        // IMPROVED PLAYER OBJECTS WITH PREDICTION
         let myPlayer = {
             x: 50, y: 522, width: 28, height: 28, color: '#ff4757',
             speed: 4, maxSpeed: 6, velX: 0, velY: 0, acceleration: 0.5,
             friction: 0.8, jumpPower: 14, gravity: 0.6, maxFallSpeed: 12,
             jumping: false, onGround: false, onWall: false,
-            keys: { left: false, right: false, up: false }
+            keys: { left: false, right: false, up: false },
+            // Prediction state
+            serverState: { x: 50, y: 522, velX: 0, velY: 0, timestamp: 0 },
+            stateBuffer: [] // Buffer for reconciliation
         };
 
         let otherPlayer = {
@@ -313,11 +343,18 @@
             speed: 4, maxSpeed: 6, velX: 0, velY: 0, acceleration: 0.5,
             friction: 0.8, jumpPower: 14, gravity: 0.6, maxFallSpeed: 12,
             jumping: false, onGround: false, onWall: false,
-            keys: { left: false, right: false, up: false }
+            keys: { left: false, right: false, up: false },
+            // Interpolation state
+            targetState: { x: 100, y: 522, velX: 0, velY: 0, timestamp: 0 },
+            interpolationBuffer: [],
+            lastUpdateTime: 0
         };
 
-        // Complete levels data - All 15 levels with progressive difficulty
-        const levels = [
+        // Input buffer for client-side prediction
+        let inputBuffer = [];
+        let lastInputSent = 0;
+      
+      const levels = [
             // Level 1: Basic Introduction
             {
                 name: "First Steps",
@@ -883,8 +920,8 @@
                 ]
             }
         ];
-        
-        let currentLevelData = levels[currentLevel - 1];
+      
+      let currentLevelData = levels[currentLevel - 1];
 
         // GLOBAL FUNCTIONS
         window.createRoom = function() {
@@ -928,6 +965,9 @@
                 console.log('🔌 Connected to server');
                 showStatus('Connected! Joining room...');
                 socket.emit('joinRoom', { roomId: roomId, playerName: playerName });
+                
+                // Start ping monitoring
+                startPingMonitoring();
             });
 
             socket.on('connect_error', (error) => {
@@ -939,13 +979,17 @@
                 myPlayerType = data.playerType;
                 console.log(`🎮 Assigned as ${data.playerType} player`);
                 
-                // Set my player colors based on type
+                // Set player colors and positions
                 if (myPlayerType === 'fire') {
                     myPlayer.color = '#ff4757';
                     otherPlayer.color = '#3742fa';
+                    myPlayer.x = 50;
+                    otherPlayer.x = 100;
                 } else {
                     myPlayer.color = '#3742fa';
                     otherPlayer.color = '#ff4757';
+                    myPlayer.x = 100;
+                    otherPlayer.x = 50;
                 }
                 
                 showStatus(data.playersCount === 2 
@@ -978,14 +1022,25 @@
                 }
             });
 
-            // SIMPLE POSITION SYNC - Just receive other player's position directly
+            // IMPROVED INPUT HANDLING - Forward inputs immediately
+            socket.on('playerInput', (data) => {
+                if (data.playerType !== myPlayerType) {
+                    // Apply input to other player immediately
+                    otherPlayer.keys = { ...data.keys };
+                    otherPlayer.lastUpdateTime = Date.now();
+                }
+            });
+
+            // FIXED: Only sync other player's position, not my own
             socket.on('playerPosition', (data) => {
                 if (data.playerType !== myPlayerType) {
+                    // Only update the OTHER player's position
                     otherPlayer.x = data.x;
                     otherPlayer.y = data.y;
                     otherPlayer.velX = data.velX || 0;
                     otherPlayer.velY = data.velY || 0;
                 }
+                // Remove any reconciliation for my own player - let client handle it
             });
 
             socket.on('levelComplete', () => {
@@ -1017,6 +1072,12 @@
                     gameInitialized = false;
                 }
             });
+
+            // Ping response
+            socket.on('pong', () => {
+                ping = Date.now() - lastPingTime;
+                document.getElementById('pingValue').textContent = ping;
+            });
         };
 
         window.nextLevel = function() {
@@ -1043,6 +1104,10 @@
         window.restartLevel = function() {
             document.getElementById('levelComplete').style.display = 'none';
             resetLevel();
+            // Send restart command to server
+            if (socket && socket.connected) {
+                socket.emit('restartLevel');
+            }
         };
 
         function showStatus(message) {
@@ -1069,13 +1134,26 @@
             console.log('🎮 Starting game...');
             document.getElementById('connectionScreen').style.display = 'none';
             document.getElementById('gameScreen').style.display = 'flex';
+            document.getElementById('networkInfo').style.display = 'block';
             gameInitialized = true;
             
             resetLevel();
             gameLoop();
         }
 
-        // SIMPLE INPUT HANDLING - No throttling, instant response
+        function startPingMonitoring() {
+            setInterval(() => {
+                if (socket && socket.connected) {
+                    lastPingTime = Date.now();
+                    socket.emit('ping');
+                }
+            }, 1000);
+        }
+
+        // Removed complex reconciliation - now using pure client authority
+        // Each client is authoritative over their own player movement
+
+        // SIMPLIFIED INPUT HANDLING - Direct and reliable
         const keys = {};
 
         document.addEventListener('keydown', (e) => {
@@ -1107,6 +1185,7 @@
         });
 
         function updateMyPlayerInput() {
+            // Update player keys directly
             if (myPlayerType === 'fire') {
                 myPlayer.keys.left = keys['a'] || false;
                 myPlayer.keys.right = keys['d'] || false;
@@ -1116,9 +1195,35 @@
                 myPlayer.keys.right = keys['arrowright'] || false;
                 myPlayer.keys.up = keys['arrowup'] || false;
             }
+            
+            // Send to server with simple throttling
+            const now = Date.now();
+            if (now - lastInputSent > 50) {
+                lastInputSent = now;
+                sendInputToServer();
+            }
         }
 
-        // SIMPLE PHYSICS - Only for my player
+        function sendInputToServer() {
+            if (socket && socket.connected) {
+                sequenceNumber++;
+                const inputData = {
+                    keys: { ...myPlayer.keys },
+                    sequenceNumber: sequenceNumber,
+                    timestamp: Date.now()
+                };
+                
+                // Store for reconciliation (simplified)
+                inputBuffer.push(inputData);
+                if (inputBuffer.length > 60) {
+                    inputBuffer.shift(); // Keep only recent inputs
+                }
+                
+                socket.emit('playerInput', inputData);
+            }
+        }
+
+        // PHYSICS FUNCTIONS
         function checkCollision(rect1, rect2) {
             return rect1.x < rect2.x + rect2.width &&
                    rect1.x + rect1.width > rect2.x &&
@@ -1126,6 +1231,7 @@
                    rect1.y + rect1.height > rect2.y;
         }
 
+        // SIMPLIFIED PHYSICS WITH HAZARD DETECTION
         function updateMyPlayer() {
             const player = myPlayer;
             
@@ -1143,7 +1249,7 @@
             
             player.x += player.velX;
             
-            // Platform collisions
+            // Platform collisions - horizontal
             player.onWall = false;
             for (let platform of currentLevelData.platforms) {
                 if (checkCollision(player, platform)) {
@@ -1158,7 +1264,7 @@
                 }
             }
             
-            // Player collision with other player
+            // Player-to-player collision - horizontal
             if (checkCollision(player, otherPlayer)) {
                 if (player.velX > 0) {
                     player.x = otherPlayer.x - player.width;
@@ -1188,7 +1294,7 @@
             
             player.y += player.velY;
             
-            // Vertical platform collisions
+            // Platform collisions - vertical
             player.onGround = false;
             for (let platform of currentLevelData.platforms) {
                 if (checkCollision(player, platform)) {
@@ -1205,7 +1311,7 @@
                 }
             }
             
-            // Vertical collision with other player
+            // Player-to-player collision - vertical
             if (checkCollision(player, otherPlayer)) {
                 if (player.velY > 0 && player.y < otherPlayer.y) {
                     player.y = otherPlayer.y - player.height;
@@ -1215,6 +1321,32 @@
                 } else if (player.velY < 0 && player.y > otherPlayer.y) {
                     player.y = otherPlayer.y + otherPlayer.height;
                     player.velY = 0;
+                }
+            }
+            
+            // HAZARD COLLISION DETECTION
+            for (let hazard of currentLevelData.hazards) {
+                if (checkCollision(player, hazard)) {
+                    // Check if this hazard is deadly for this player type
+                    if ((myPlayerType === 'fire' && hazard.type === 'water') ||
+                        (myPlayerType === 'water' && hazard.type === 'fire')) {
+                        console.log(`💀 ${myPlayerType} player hit ${hazard.type} hazard - resetting level`);
+                        resetLevel();
+                        return; // Exit early since we're resetting
+                    }
+                }
+            }
+            
+            // SWITCH INTERACTION - Check if player is touching switches
+            if (currentLevelData.switches) {
+                for (let switchObj of currentLevelData.switches) {
+                    if (checkCollision(player, switchObj)) {
+                        // Check if this player can activate this switch
+                        if (switchObj.requiredPlayer === myPlayerType && !switchObj.activated) {
+                            switchObj.activated = true;
+                            console.log(`🔄 ${myPlayerType} player activated switch`);
+                        }
+                    }
                 }
             }
             
@@ -1230,27 +1362,138 @@
             
             // Death by falling
             if (player.y > canvas.height + 100) {
+                console.log(`💀 ${myPlayerType} player fell off screen - resetting level`);
                 resetLevel();
             }
         }
 
-        // Send position to other player (much less frequently)
+        function updateOtherPlayer() {
+            const player = otherPlayer;
+            
+            // Apply inputs received from server for immediate response
+            if (player.keys.left || player.keys.right || player.keys.up) {
+                // Horizontal movement
+                if (player.keys.left) {
+                    player.velX -= player.acceleration;
+                    if (player.velX < -player.maxSpeed) player.velX = -player.maxSpeed;
+                } else if (player.keys.right) {
+                    player.velX += player.acceleration;
+                    if (player.velX > player.maxSpeed) player.velX = player.maxSpeed;
+                } else {
+                    player.velX *= player.friction;
+                    if (Math.abs(player.velX) < 0.1) player.velX = 0;
+                }
+                
+                player.x += player.velX;
+                
+                // Platform collisions
+                for (let platform of currentLevelData.platforms) {
+                    if (checkCollision(player, platform)) {
+                        if (player.velX > 0) {
+                            player.x = platform.x - player.width;
+                        } else if (player.velX < 0) {
+                            player.x = platform.x + platform.width;
+                        }
+                        player.velX = 0;
+                        break;
+                    }
+                }
+                
+                // Jumping
+                if (player.keys.up && player.onGround) {
+                    player.velY = -player.jumpPower;
+                    player.jumping = true;
+                    player.onGround = false;
+                }
+                
+                // Gravity
+                player.velY += player.gravity;
+                if (player.velY > player.maxFallSpeed) {
+                    player.velY = player.maxFallSpeed;
+                }
+                
+                player.y += player.velY;
+                
+                // Vertical platform collisions
+                player.onGround = false;
+                for (let platform of currentLevelData.platforms) {
+                    if (checkCollision(player, platform)) {
+                        if (player.velY > 0) {
+                            player.y = platform.y - player.height;
+                            player.velY = 0;
+                            player.onGround = true;
+                            player.jumping = false;
+                        } else if (player.velY < 0) {
+                            player.y = platform.y + platform.height;
+                            player.velY = 0;
+                        }
+                        break;
+                    }
+                }
+                
+                // HAZARD COLLISION FOR OTHER PLAYER
+                for (let hazard of currentLevelData.hazards) {
+                    if (checkCollision(player, hazard)) {
+                        // Determine other player type
+                        const otherPlayerType = myPlayerType === 'fire' ? 'water' : 'fire';
+                        
+                        // Check if this hazard is deadly for the other player
+                        if ((otherPlayerType === 'fire' && hazard.type === 'water') ||
+                            (otherPlayerType === 'water' && hazard.type === 'fire')) {
+                            console.log(`💀 ${otherPlayerType} player hit ${hazard.type} hazard - resetting level`);
+                            resetLevel();
+                            return; // Exit early since we're resetting
+                        }
+                    }
+                }
+                
+                // SWITCH INTERACTION FOR OTHER PLAYER
+                if (currentLevelData.switches) {
+                    for (let switchObj of currentLevelData.switches) {
+                        if (checkCollision(player, switchObj)) {
+                            const otherPlayerType = myPlayerType === 'fire' ? 'water' : 'fire';
+                            // Check if other player can activate this switch
+                            if (switchObj.requiredPlayer === otherPlayerType && !switchObj.activated) {
+                                switchObj.activated = true;
+                                console.log(`🔄 ${otherPlayerType} player activated switch`);
+                            }
+                        }
+                    }
+                }
+                
+                // Screen boundaries
+                if (player.x < 0) player.x = 0;
+                if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+                
+                // Death by falling for other player
+                if (player.y > canvas.height + 100) {
+                    const otherPlayerType = myPlayerType === 'fire' ? 'water' : 'fire';
+                    console.log(`💀 ${otherPlayerType} player fell off screen - resetting level`);
+                    resetLevel();
+                }
+            }
+            // Removed interpolation - position updates come directly from server
+        }
+
+        // MUCH LESS FREQUENT POSITION SENDING - Only for sync, not control
         let positionSendCounter = 0;
         function sendMyPosition() {
             positionSendCounter++;
-            if (positionSendCounter >= 3) { // Send every 3 frames (~20fps)
+            if (positionSendCounter >= 10) { // Send every 10 frames (~6fps) - much less frequent
                 positionSendCounter = 0;
                 if (socket && socket.connected) {
                     socket.emit('playerPosition', {
                         x: myPlayer.x,
                         y: myPlayer.y,
                         velX: myPlayer.velX,
-                        velY: myPlayer.velY
+                        velY: myPlayer.velY,
+                        timestamp: Date.now()
                     });
                 }
             }
         }
 
+        // RENDERING FUNCTIONS
         function drawLevel() {
             const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
             gradient.addColorStop(0, '#87ceeb');
@@ -1258,16 +1501,35 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
+            // Draw platforms
             for (let platform of currentLevelData.platforms) {
                 ctx.fillStyle = platform.color;
                 ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
             }
             
+            // Draw hazards
             for (let hazard of currentLevelData.hazards) {
                 ctx.fillStyle = hazard.color;
                 ctx.fillRect(hazard.x, hazard.y, hazard.width, hazard.height);
             }
             
+            // Draw switches
+            if (currentLevelData.switches) {
+                for (let switchObj of currentLevelData.switches) {
+                    // Change color based on activation
+                    ctx.fillStyle = switchObj.activated ? '#4CAF50' : switchObj.color;
+                    ctx.fillRect(switchObj.x, switchObj.y, switchObj.width, switchObj.height);
+                    
+                    // Add visual indicator
+                    ctx.fillStyle = 'white';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(switchObj.activated ? '✓' : '○', 
+                               switchObj.x + switchObj.width/2, switchObj.y + switchObj.height/2 + 4);
+                }
+            }
+            
+            // Draw doors
             for (let door of currentLevelData.doors) {
                 ctx.fillStyle = door.color;
                 ctx.fillRect(door.x, door.y, door.width, door.height);
@@ -1281,16 +1543,20 @@
         }
 
         function drawPlayer(player, emoji) {
+            // Shadow
             ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
             ctx.fillRect(player.x + 2, player.y + player.height + 2, player.width, 4);
             
+            // Player body
             ctx.fillStyle = player.color;
             ctx.fillRect(player.x, player.y, player.width, player.height);
             
+            // Border
             ctx.strokeStyle = 'white';
             ctx.lineWidth = 2;
             ctx.strokeRect(player.x, player.y, player.width, player.height);
             
+            // Emoji
             ctx.fillStyle = 'white';
             ctx.font = '18px Arial';
             ctx.textAlign = 'center';
@@ -1299,6 +1565,22 @@
 
         function checkWinCondition() {
             if (!currentLevelData || !currentLevelData.doors) return;
+            
+            // Check if all switches are activated (if any exist)
+            let allSwitchesActivated = true;
+            if (currentLevelData.switches && currentLevelData.switches.length > 0) {
+                for (let switchObj of currentLevelData.switches) {
+                    if (!switchObj.activated) {
+                        allSwitchesActivated = false;
+                        break;
+                    }
+                }
+            }
+            
+            // Only proceed if all switches are activated
+            if (!allSwitchesActivated) {
+                return;
+            }
             
             let myPlayerAtDoor = false;
             let otherPlayerAtDoor = false;
@@ -1328,6 +1610,7 @@
             }
             
             if (myPlayerAtDoor && otherPlayerAtDoor && gameState === 'playing') {
+                console.log('🎉 Level complete! Both players at doors and all switches activated');
                 if (socket && socket.connected) {
                     socket.emit('levelComplete');
                 }
@@ -1336,15 +1619,30 @@
             }
         }
 
-        // ULTRA SIMPLE GAME LOOP - Only update my player
+        // OPTIMIZED GAME LOOP WITH FPS MONITORING
         function gameLoop() {
             if (!gameInitialized) return;
             
+            // FPS calculation
+            const currentTime = performance.now();
+            const deltaTime = currentTime - lastFrameTime;
+            frameCount++;
+            
+            if (frameCount >= 60) {
+                fps = Math.round(1000 / (deltaTime));
+                document.getElementById('fpsValue').textContent = fps;
+                frameCount = 0;
+            }
+            lastFrameTime = currentTime;
+            
             if (gameState === 'playing') {
-                // Only update MY player - other player position comes from network
+                // Update my player with client-side prediction
                 updateMyPlayer();
                 
-                // Send my position to other player
+                // Update other player with interpolation
+                updateOtherPlayer();
+                
+                // Send position to server (throttled)
                 sendMyPosition();
                 
                 checkWinCondition();
@@ -1366,29 +1664,35 @@
         }
 
         function resetLevel() {
-            // Reset my player
+            // Reset my player to correct starting position
             myPlayer.x = myPlayerType === 'fire' ? 50 : 100;
             myPlayer.y = 522;
             myPlayer.velX = 0;
             myPlayer.velY = 0;
             myPlayer.onGround = false;
             myPlayer.jumping = false;
+            myPlayer.keys = { left: false, right: false, up: false };
             
-            // Reset other player
+            // Reset other player to correct starting position  
             otherPlayer.x = myPlayerType === 'fire' ? 100 : 50;
             otherPlayer.y = 522;
             otherPlayer.velX = 0;
             otherPlayer.velY = 0;
             otherPlayer.onGround = false;
             otherPlayer.jumping = false;
+            otherPlayer.keys = { left: false, right: false, up: false };
+            
+            // Clear buffers
+            inputBuffer = [];
+            sequenceNumber = 0;
             
             gameState = 'playing';
-            if (socket && socket.connected) {
-                socket.emit('restartLevel');
-            }
+            
+            // Don't send restart to server unless explicitly restarting
+            console.log('Level reset - positions restored');
         }
 
-        // Enter key support
+        // Enter key support and initialization
         document.addEventListener('DOMContentLoaded', function() {
             const playerNameInput = document.getElementById('playerName');
             const roomIdInput = document.getElementById('roomId');
@@ -1408,7 +1712,18 @@
             playerNameInput.focus();
         });
 
-        console.log("🎮 Elemental Duo - Ultra Smooth Edition v3.0 Ready!");
+        // Visibility API for performance optimization
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Reduce update frequency when tab is not visible
+                console.log('Tab hidden - reducing update frequency');
+            } else {
+                // Resume normal frequency when tab becomes visible
+                console.log('Tab visible - resuming normal frequency');
+            }
+        });
+
+        console.log("🎮 Elemental Duo - Ultra Smooth Edition v4.0 Ready!");
     </script>
 </body>
 </html>

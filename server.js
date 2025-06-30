@@ -201,46 +201,44 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Optimized input forwarding with better throttling
-    socket.on('playerInput', (keys) => {
+    // SIMPLIFIED: Direct position forwarding instead of input prediction
+    socket.on('playerPosition', (positionData) => {
         try {
             if (!socket.roomId || !socket.playerType) return;
             
             const room = gameRooms.get(socket.roomId);
             if (!room) return;
             
-            // Enhanced throttling and validation
+            // Throttle position updates - max 20 per second
             const now = Date.now();
             const lastUpdate = room.lastInputUpdate.get(socket.id) || 0;
             
-            // Throttle to max 15 updates per second per player (reduced from 20)
-            if (now - lastUpdate < 67) {
-                return false; // Skip this update
-            }
-            
-            // Validate input structure
-            if (!keys || typeof keys !== 'object') {
-                return false;
+            if (now - lastUpdate < 50) {
+                return; // Skip this update
             }
             
             room.lastInputUpdate.set(socket.id, now);
             
-            // Forward to other players with player identification
+            // Forward position directly to other players
             for (let player of room.players.values()) {
                 if (player.socket !== socket) {
-                    player.socket.emit('playerInput', {
+                    player.socket.emit('playerPosition', {
                         playerType: socket.playerType,
-                        keys: keys,
-                        timestamp: now
+                        x: positionData.x,
+                        y: positionData.y,
+                        velX: positionData.velX,
+                        velY: positionData.velY
                     });
                 }
             }
             
-            return true;
         } catch (error) {
-            console.error('Error forwarding input:', error);
+            console.error('Error forwarding position:', error);
         }
     });
+
+    // Remove the old playerInput handler - we don't need it anymore
+    // socket.on('playerInput', ...) - REMOVED
 
     // Handle level events with validation
     socket.on('levelComplete', () => {

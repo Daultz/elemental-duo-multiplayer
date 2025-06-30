@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -254,8 +255,8 @@
                 <input type="text" id="roomId" placeholder="Room ID (or create new)" maxlength="20" autocomplete="off">
             </div>
             
-            <button class="btn" onclick="joinGame()">🚪 Join Game</button>
-            <button class="btn" onclick="createRoom()">🆕 Create Room</button>
+            <button class="btn" onclick="window.joinGame()">🚪 Join Game</button>
+            <button class="btn" onclick="window.createRoom()">🆕 Create Room</button>
             
             <div class="status-message" id="statusMessage">
                 Enter your name and room ID to start your cooperative adventure!
@@ -293,16 +294,16 @@
         <div id="levelComplete" class="level-complete">
             <h2>🎉 Level Complete! 🎉</h2>
             <p id="levelCompleteText">Excellent teamwork! Ready for the next challenge?</p>
-            <button class="btn" onclick="nextLevel()">➡️ Next Level</button>
-            <button class="btn" onclick="restartLevel()">🔄 Restart Level</button>
+            <button class="btn" onclick="window.nextLevel()">➡️ Next Level</button>
+            <button class="btn" onclick="window.restartLevel()">🔄 Restart Level</button>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        console.log("🎮 Elemental Duo - Complete Edition v2.1 Loading...");
+        console.log("🎮 Elemental Duo - Complete Edition v2.2 Loading...");
         
-        // Improved networking with client-side prediction
+        // Global variables
         let socket = null;
         let myPlayerType = null;
         let gameInitialized = false;
@@ -323,7 +324,6 @@
             friction: 0.8, jumpPower: 14, gravity: 0.6, maxFallSpeed: 12,
             jumping: false, onGround: false, onWall: false,
             keys: { left: false, right: false, up: false },
-            // Prediction data
             serverX: 50, serverY: 522, serverVelX: 0, serverVelY: 0,
             lastServerUpdate: 0
         };
@@ -334,10 +334,9 @@
             friction: 0.8, jumpPower: 14, gravity: 0.6, maxFallSpeed: 12,
             jumping: false, onGround: false, onWall: false,
             keys: { left: false, right: false, up: false },
-            // Prediction data
             serverX: 100, serverY: 522, serverVelX: 0, serverVelY: 0,
             lastServerUpdate: 0
-        };  
+        };
 
         // Complete levels data - All 15 levels with progressive difficulty
         const levels = [
@@ -909,8 +908,9 @@
         
         let currentLevelData = levels[currentLevel - 1];
 
-        // Connection functions with improved error handling
-        function createRoom() {
+        // GLOBAL FUNCTIONS - Make sure these are accessible from HTML onclick
+        window.createRoom = function() {
+            console.log("🆕 Create room button clicked");
             const playerName = document.getElementById('playerName').value.trim();
             if (!playerName) {
                 showStatus('Please enter your name!');
@@ -921,9 +921,10 @@
             document.getElementById('roomId').value = roomId;
             showStatus(`Creating room ${roomId}...`);
             joinGame();
-        }
+        };
 
-        function joinGame() {
+        window.joinGame = function() {
+            console.log("🚪 Join game function called");
             const playerName = document.getElementById('playerName').value.trim();
             const roomId = document.getElementById('roomId').value.trim().toUpperCase();
             
@@ -932,23 +933,33 @@
                 return;
             }
 
+            console.log(`Attempting to join room: ${roomId} as ${playerName}`);
+
             // Prevent multiple connections
             if (socket && socket.connected) {
+                console.log("Disconnecting existing socket");
                 socket.disconnect();
             }
 
             showStatus('Connecting to server...');
             
             // Initialize socket with better error handling
-            socket = io({
-                transports: ['websocket', 'polling'],
-                timeout: 20000,
-                forceNew: true
-            });
+            try {
+                socket = io({
+                    transports: ['websocket', 'polling'],
+                    timeout: 20000,
+                    forceNew: true
+                });
+                console.log("Socket created successfully");
+            } catch (error) {
+                console.error("Failed to create socket:", error);
+                showStatus('❌ Failed to initialize connection');
+                return;
+            }
 
             // Connection timeout
             const connectionTimeout = setTimeout(() => {
-                if (!socket.connected) {
+                if (!socket || !socket.connected) {
                     showStatus('❌ Connection timeout. Please try again or check your internet connection.');
                     if (socket) socket.disconnect();
                 }
@@ -1007,7 +1018,6 @@
                 console.log('Player left:', data);
                 showStatus(`😞 ${data.playerType} player left the game. Waiting for new partner...`);
                 
-                // Hide game screen and show connection screen
                 if (gameInitialized) {
                     document.getElementById('gameScreen').style.display = 'none';
                     document.getElementById('connectionScreen').style.display = 'flex';
@@ -1015,7 +1025,6 @@
                 }
             });
 
-            // Improved: Only receive input from other player with interpolation
             socket.on('playerInput', (data) => {
                 if (data.playerType !== myPlayerType) {
                     const targetPlayer = data.playerType === 'fire' ? firePlayer : waterPlayer;
@@ -1048,14 +1057,39 @@
                 console.log('🔌 Disconnected from server. Reason:', reason);
                 showStatus('🔌 Disconnected from server. Refresh to reconnect.');
                 
-                // Reset game state
                 if (gameInitialized) {
                     document.getElementById('gameScreen').style.display = 'none';
                     document.getElementById('connectionScreen').style.display = 'flex';
                     gameInitialized = false;
                 }
             });
-        }
+        };
+
+        window.nextLevel = function() {
+            if (currentLevel < levels.length) {
+                currentLevel++;
+                currentLevelData = levels[currentLevel - 1];
+                document.getElementById('levelInfo').textContent = `Level ${currentLevel} - Get both players to their colored doors!`;
+                resetLevel();
+            } else {
+                showStatus('🎉 Congratulations! You completed all levels together! 🎉');
+                currentLevel = 1;
+                currentLevelData = levels[0];
+                document.getElementById('levelInfo').textContent = 'Level 1 - Get both players to their colored doors!';
+                resetLevel();
+            }
+            
+            if (socket && myPlayerType) {
+                socket.emit('nextLevel');
+            }
+            document.getElementById('levelComplete').style.display = 'none';
+            gameState = 'playing';
+        };
+
+        window.restartLevel = function() {
+            document.getElementById('levelComplete').style.display = 'none';
+            resetLevel();
+        };
 
         function showStatus(message) {
             const statusElement = document.getElementById('statusMessage');
@@ -1068,7 +1102,6 @@
             document.getElementById('roomInfo').innerHTML = `Room: ${data.roomId}<br>Players: ${data.playersCount}/2`;
             document.getElementById('playerIndicator').style.display = 'block';
             
-            // Update controls highlighting
             document.getElementById('fireControls').classList.remove('my-controls');
             document.getElementById('waterControls').classList.remove('my-controls');
             
@@ -1085,17 +1118,14 @@
             document.getElementById('gameScreen').style.display = 'flex';
             gameInitialized = true;
             
-            // Reset player positions
             resetLevel();
-            
-            // Start the game loop
             gameLoop();
         }
 
-        // Improved input handling with throttling
+        // Input handling
         const keys = {};
         let inputSendCooldown = 0;
-        const INPUT_SEND_RATE = 3; // Send input every 3 frames (20 times per second at 60fps)
+        const INPUT_SEND_RATE = 3;
 
         document.addEventListener('keydown', (e) => {
             if (!gameInitialized || !myPlayerType) return;
@@ -1142,22 +1172,22 @@
                 currentKeys.up = keys['arrowup'] || false;
             }
 
-            // Update local player immediately for responsiveness
             if (myPlayerType === 'fire') {
                 firePlayer.keys = currentKeys;
             } else if (myPlayerType === 'water') {
                 waterPlayer.keys = currentKeys;
             }
 
-            // Throttle network sends and only send if input changed
             if (inputSendCooldown <= 0 && JSON.stringify(currentKeys) !== JSON.stringify(lastInputSent)) {
-                socket.emit('playerInput', currentKeys);
+                if (socket && socket.connected) {
+                    socket.emit('playerInput', currentKeys);
+                }
                 lastInputSent = { ...currentKeys };
                 inputSendCooldown = INPUT_SEND_RATE;
             }
         }
 
-        // Improved physics with better collision detection
+        // Simple physics for testing
         function checkCollision(rect1, rect2) {
             return rect1.x < rect2.x + rect2.width &&
                    rect1.x + rect1.width > rect2.x &&
@@ -1165,12 +1195,10 @@
                    rect1.y + rect1.height > rect2.y;
         }
 
-        function updatePlayer(player, otherPlayer, isLocalPlayer) {
-            // Store previous position for collision resolution
+        function updatePlayer(player, otherPlayer) {
             const prevX = player.x;
             const prevY = player.y;
             
-            // Horizontal movement with improved responsiveness
             if (player.keys.left) {
                 player.velX -= player.acceleration;
                 if (player.velX < -player.maxSpeed) player.velX = -player.maxSpeed;
@@ -1184,7 +1212,6 @@
             
             player.x += player.velX;
             
-            // Platform collisions with better resolution
             let hitWall = false;
             for (let platform of currentLevelData.platforms) {
                 if (checkCollision(player, platform)) {
@@ -1200,36 +1227,31 @@
             }
             player.onWall = hitWall;
             
-            // Player collision with smoother resolution
             if (checkCollision(player, otherPlayer)) {
                 if (player.velX > 0) {
                     player.x = otherPlayer.x - player.width;
                 } else if (player.velX < 0) {
                     player.x = otherPlayer.x + otherPlayer.width;
                 }
-                player.velX *= 0.5; // Softer collision
+                player.velX *= 0.5;
             }
             
-            // Improved jumping with coyote time
             if (player.keys.up && (player.onGround || (player.onWall && !player.onGround))) {
                 if (!player.jumping || player.onGround) {
                     player.velY = -player.jumpPower;
                     player.jumping = true;
                     player.onGround = false;
                     
-                    // Wall jump
                     if (player.onWall && !player.onGround) {
                         player.velX += player.keys.left ? 4 : -4;
                     }
                 }
             }
             
-            // Variable jump height
             if (!player.keys.up && player.jumping && player.velY < -3) {
                 player.velY *= 0.6;
             }
             
-            // Gravity
             player.velY += player.gravity;
             if (player.velY > player.maxFallSpeed) {
                 player.velY = player.maxFallSpeed;
@@ -1237,7 +1259,6 @@
             
             player.y += player.velY;
             
-            // Vertical platform collisions
             player.onGround = false;
             for (let platform of currentLevelData.platforms) {
                 if (checkCollision(player, platform)) {
@@ -1254,7 +1275,6 @@
                 }
             }
             
-            // Player vertical collision
             if (checkCollision(player, otherPlayer)) {
                 if (player.velY > 0 && prevY < otherPlayer.y) {
                     player.y = otherPlayer.y - player.height;
@@ -1267,7 +1287,6 @@
                 }
             }
             
-            // Screen boundaries
             if (player.x < 0) {
                 player.x = 0;
                 player.velX = 0;
@@ -1277,8 +1296,162 @@
                 player.velX = 0;
             }
             
-            // Death by falling
             if (player.y > canvas.height + 100) {
                 resetLevel();
             }
         }
+
+        function drawLevel() {
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87ceeb');
+            gradient.addColorStop(1, '#98fb98');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for (let platform of currentLevelData.platforms) {
+                ctx.fillStyle = platform.color;
+                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            }
+            
+            for (let hazard of currentLevelData.hazards) {
+                ctx.fillStyle = hazard.color;
+                ctx.fillRect(hazard.x, hazard.y, hazard.width, hazard.height);
+            }
+            
+            for (let door of currentLevelData.doors) {
+                ctx.fillStyle = door.color;
+                ctx.fillRect(door.x, door.y, door.width, door.height);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '24px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(door.type === 'fire' ? '🔥' : '💧', 
+                           door.x + door.width/2, door.y + door.height/2 + 8);
+            }
+        }
+
+        function drawPlayer(player, emoji) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(player.x + 2, player.y + player.height + 2, player.width, 4);
+            
+            const gradient = ctx.createLinearGradient(player.x, player.y, player.x, player.y + player.height);
+            gradient.addColorStop(0, player.color);
+            gradient.addColorStop(1, player.color === '#ff4757' ? '#ff3742' : '#2f3542');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(player.x, player.y, player.width, player.height);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = '18px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(emoji, player.x + player.width/2, player.y + player.height/2 + 5);
+        }
+
+        function checkWinCondition() {
+            if (!currentLevelData || !currentLevelData.doors) return;
+            
+            let fireAtDoor = false;
+            let waterAtDoor = false;
+            
+            for (let door of currentLevelData.doors) {
+                if (door.type === 'fire' &&
+                    firePlayer.x < door.x + door.width &&
+                    firePlayer.x + firePlayer.width > door.x &&
+                    firePlayer.y < door.y + door.height &&
+                    firePlayer.y + firePlayer.height > door.y) {
+                    fireAtDoor = true;
+                }
+                
+                if (door.type === 'water' &&
+                    waterPlayer.x < door.x + door.width &&
+                    waterPlayer.x + waterPlayer.width > door.x &&
+                    waterPlayer.y < door.y + door.height &&
+                    waterPlayer.y + waterPlayer.height > door.y) {
+                    waterAtDoor = true;
+                }
+            }
+            
+            if (fireAtDoor && waterAtDoor && gameState === 'playing') {
+                if (socket && socket.connected) {
+                    socket.emit('levelComplete');
+                }
+                document.getElementById('levelComplete').style.display = 'block';
+                gameState = 'complete';
+            }
+        }
+
+        function gameLoop() {
+            if (!gameInitialized) return;
+            
+            frameCount++;
+            
+            if (inputSendCooldown > 0) {
+                inputSendCooldown--;
+            }
+            
+            if (gameState === 'playing') {
+                if (myPlayerType === 'fire') {
+                    updatePlayer(firePlayer, waterPlayer);
+                    updatePlayer(waterPlayer, firePlayer);
+                } else if (myPlayerType === 'water') {
+                    updatePlayer(waterPlayer, firePlayer);
+                    updatePlayer(firePlayer, waterPlayer);
+                }
+                
+                checkWinCondition();
+            }
+            
+            drawLevel();
+            drawPlayer(firePlayer, '🔥');
+            drawPlayer(waterPlayer, '💧');
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        function resetLevel() {
+            firePlayer.x = 50;
+            firePlayer.y = 522;
+            firePlayer.velX = 0;
+            firePlayer.velY = 0;
+            firePlayer.onGround = false;
+            firePlayer.jumping = false;
+            
+            waterPlayer.x = 100;
+            waterPlayer.y = 522;
+            waterPlayer.velX = 0;
+            waterPlayer.velY = 0;
+            waterPlayer.onGround = false;
+            waterPlayer.jumping = false;
+            
+            gameState = 'playing';
+            if (socket && myPlayerType && socket.connected) {
+                socket.emit('restartLevel');
+            }
+        }
+
+        // Enter key support for easier room joining
+        document.addEventListener('DOMContentLoaded', function() {
+            const playerNameInput = document.getElementById('playerName');
+            const roomIdInput = document.getElementById('roomId');
+            
+            playerNameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    roomIdInput.focus();
+                }
+            });
+            
+            roomIdInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    window.joinGame();
+                }
+            });
+            
+            playerNameInput.focus();
+        });
+
+        console.log("🎮 Elemental Duo - Complete Edition v2.2 Ready!");
+    </script>
+</body>

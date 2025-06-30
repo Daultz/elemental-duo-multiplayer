@@ -377,15 +377,26 @@
             });
 
             socket.on('gameStateUpdate', (serverGameState) => {
-                // Update game state from server
+                // Update game state from server, but don't override local player's position
                 if (serverGameState.currentLevel !== currentLevel) {
                     currentLevel = serverGameState.currentLevel;
                     currentLevelData = levels[currentLevel - 1];
                     document.getElementById('levelInfo').textContent = `Level ${currentLevel} - Get both players to their colored doors!`;
                 }
                 
-                firePlayer = { ...firePlayer, ...serverGameState.firePlayer };
-                waterPlayer = { ...waterPlayer, ...serverGameState.waterPlayer };
+                // Only update the OTHER player's data from server to avoid conflicts
+                if (myPlayerType === 'fire' && serverGameState.waterPlayer) {
+                    // I'm fire player, update water player from server
+                    waterPlayer = { ...waterPlayer, ...serverGameState.waterPlayer };
+                } else if (myPlayerType === 'water' && serverGameState.firePlayer) {
+                    // I'm water player, update fire player from server  
+                    firePlayer = { ...firePlayer, ...serverGameState.firePlayer };
+                }
+                
+                // Update switches and other shared state
+                if (serverGameState.switches && currentLevelData) {
+                    currentLevelData.switches = serverGameState.switches;
+                }
             });
 
             socket.on('levelComplete', () => {
@@ -779,6 +790,10 @@
             }
         }
 
+        // Add throttling for server updates
+        let lastServerUpdate = 0;
+        const SERVER_UPDATE_INTERVAL = 50; // Update server every 50ms (20 FPS)
+
         function gameLoop() {
             if (!gameInitialized) return;
             
@@ -795,19 +810,24 @@
                 checkSwitchActivation();
                 checkWinCondition();
                 
-                // Send my player's state to server
-                if (myPlayerType === 'fire') {
-                    socket.emit('gameStateUpdate', {
-                        firePlayer: firePlayer,
-                        currentLevel: currentLevel,
-                        switches: currentLevelData ? currentLevelData.switches : []
-                    });
-                } else if (myPlayerType === 'water') {
-                    socket.emit('gameStateUpdate', {
-                        waterPlayer: waterPlayer,
-                        currentLevel: currentLevel,
-                        switches: currentLevelData ? currentLevelData.switches : []
-                    });
+                // Throttle server updates to reduce network spam
+                const now = Date.now();
+                if (now - lastServerUpdate > SERVER_UPDATE_INTERVAL) {
+                    // Send my player's state to server
+                    if (myPlayerType === 'fire') {
+                        socket.emit('gameStateUpdate', {
+                            firePlayer: firePlayer,
+                            currentLevel: currentLevel,
+                            switches: currentLevelData ? currentLevelData.switches : []
+                        });
+                    } else if (myPlayerType === 'water') {
+                        socket.emit('gameStateUpdate', {
+                            waterPlayer: waterPlayer,
+                            currentLevel: currentLevel,
+                            switches: currentLevelData ? currentLevelData.switches : []
+                        });
+                    }
+                    lastServerUpdate = now;
                 }
             }
             

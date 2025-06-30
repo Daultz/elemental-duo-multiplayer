@@ -197,8 +197,8 @@ io.on('connection', (socket) => {
                 room.gameState.switches = gameState.switches;
             }
             
-            // Broadcast the complete game state to all players
-            room.broadcastToRoom('gameStateUpdate', room.gameState);
+            // Broadcast ONLY to OTHER players in the room (not back to sender)
+            socket.to(socket.roomId).emit('gameStateUpdate', room.gameState);
         }
     });
 

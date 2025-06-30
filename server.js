@@ -1,4 +1,5 @@
-// server.js - Elemental Duo Multiplayer Server
+// server.js - Elemental Duo Multiplayer Server v2.0
+// Optimized for lag-free multiplayer gaming
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -13,51 +14,25 @@ const io = socketIo(server, {
     }
 });
 
-// Serve static files
+// Serve static files from public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Game rooms storage
+// Game rooms storage - Lightweight approach
 const gameRooms = new Map();
 
 class GameRoom {
     constructor(roomId) {
         this.roomId = roomId;
         this.players = new Map();
-        this.gameState = {
-            currentLevel: 1,
-            levelComplete: false,
-            switches: [],
-            firePlayer: {
-                x: 50,
-                y: 522,
-                width: 28,
-                height: 28,
-                velX: 0,
-                velY: 0,
-                onGround: false,
-                jumping: false,
-                keys: { left: false, right: false, up: false }
-            },
-            waterPlayer: {
-                x: 100,
-                y: 522,
-                width: 28,
-                height: 28,
-                velX: 0,
-                velY: 0,
-                onGround: false,
-                jumping: false,
-                keys: { left: false, right: false, up: false }
-            }
-        };
-        this.lastUpdate = Date.now();
+        this.currentLevel = 1;
+        this.createdAt = new Date();
     }
 
     addPlayer(socket, playerType) {
         this.players.set(socket.id, {
             socket: socket,
-            playerType: playerType, // 'fire' or 'water'
-            ready: false
+            playerType: playerType,
+            joinedAt: new Date()
         });
     }
 
@@ -66,19 +41,13 @@ class GameRoom {
     }
 
     isFull() {
-        const full = this.players.size >= 2;
-        console.log(`Room ${this.roomId} isFull check: ${this.players.size}/2 players, returning ${full}`);
-        return full;
+        return this.players.size >= 2;
     }
 
     hasPlayerType(type) {
         for (let player of this.players.values()) {
-            if (player.playerType === type) {
-                console.log(`Room ${this.roomId} already has ${type} player`);
-                return true;
-            }
+            if (player.playerType === type) return true;
         }
-        console.log(`Room ${this.roomId} does NOT have ${type} player`);
         return false;
     }
 
@@ -88,32 +57,19 @@ class GameRoom {
         }
     }
 
-    updatePlayerInput(socketId, keys) {
-        const player = this.players.get(socketId);
-        if (!player) return;
-
-        if (player.playerType === 'fire') {
-            this.gameState.firePlayer.keys = keys;
-        } else if (player.playerType === 'water') {
-            this.gameState.waterPlayer.keys = keys;
-        }
-
-        // Broadcast input to other players
-        this.broadcastToRoom('playerInput', {
-            playerType: player.playerType,
-            keys: keys
-        });
-    }
-
-    updateGameState(gameState) {
-        this.gameState = { ...this.gameState, ...gameState };
-        this.broadcastToRoom('gameStateUpdate', this.gameState);
+    getStats() {
+        return {
+            roomId: this.roomId,
+            playerCount: this.players.size,
+            currentLevel: this.currentLevel,
+            uptime: Date.now() - this.createdAt.getTime()
+        };
     }
 }
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
-    console.log(`Player connected: ${socket.id}`);
+    console.log(`🔌 Player connected: ${socket.id}`);
 
     // Join or create room
     socket.on('joinRoom', (data) => {
@@ -123,23 +79,22 @@ io.on('connection', (socket) => {
         if (!room) {
             room = new GameRoom(roomId);
             gameRooms.set(roomId, room);
-            console.log(`Created new room: ${roomId}`);
+            console.log(`🏠 Created new room: ${roomId}`);
         }
 
         if (room.isFull()) {
-            console.log(`Room ${roomId} is full, rejecting player ${socket.id}`);
+            console.log(`❌ Room ${roomId} is full`);
             socket.emit('roomFull');
             return;
         }
 
-        // Assign player type based on what's available
+        // Assign player type based on availability
         let playerType;
         if (!room.hasPlayerType('fire')) {
             playerType = 'fire';
         } else if (!room.hasPlayerType('water')) {
             playerType = 'water';
         } else {
-            console.log(`Room ${roomId} has both player types, rejecting ${socket.id}`);
             socket.emit('roomFull');
             return;
         }
@@ -149,8 +104,9 @@ io.on('connection', (socket) => {
         socket.join(roomId);
         socket.roomId = roomId;
         socket.playerType = playerType;
+        socket.playerName = playerName;
 
-        console.log(`Player ${socket.id} joined room ${roomId} as ${playerType} player. Room now has ${room.players.size}/2 players`);
+        console.log(`🎮 ${playerName} (${playerType}) joined room ${roomId} (${room.players.size}/2)`);
 
         socket.emit('playerAssigned', {
             playerType: playerType,
@@ -158,132 +114,117 @@ io.on('connection', (socket) => {
             playersCount: room.players.size
         });
 
-        // Notify other players in the room
+        // Notify other players
         socket.to(roomId).emit('playerJoined', {
             playerType: playerType,
-            playersCount: room.players.size
+            playersCount: room.players.size,
+            playerName: playerName
         });
-
-        // Send initial game state
-        socket.emit('gameStateUpdate', room.gameState);
     });
 
-    // Handle player input
+    // Handle input forwarding - Core multiplayer functionality
     socket.on('playerInput', (keys) => {
-        if (!socket.roomId) return;
-        const room = gameRooms.get(socket.roomId);
-        if (room) {
-            room.updatePlayerInput(socket.id, keys);
-        }
+        if (!socket.roomId || !socket.playerType) return;
+        
+        // Forward input to other players in room
+        socket.to(socket.roomId).emit('playerInput', {
+            playerType: socket.playerType,
+            keys: keys
+        });
     });
 
-    // Handle game state updates
-    socket.on('gameStateUpdate', (gameState) => {
-        if (!socket.roomId) return;
-        const room = gameRooms.get(socket.roomId);
-        if (room) {
-            // Update only the player's own character data
-            if (socket.playerType === 'fire' && gameState.firePlayer) {
-                room.gameState.firePlayer = { ...room.gameState.firePlayer, ...gameState.firePlayer };
-            } else if (socket.playerType === 'water' && gameState.waterPlayer) {
-                room.gameState.waterPlayer = { ...room.gameState.waterPlayer, ...gameState.waterPlayer };
-            }
-            
-            // Update shared game state
-            if (gameState.currentLevel) {
-                room.gameState.currentLevel = gameState.currentLevel;
-            }
-            if (gameState.switches) {
-                room.gameState.switches = gameState.switches;
-            }
-            
-            // Broadcast ONLY to OTHER players in the room (not back to sender)
-            socket.to(socket.roomId).emit('gameStateUpdate', room.gameState);
-        }
-    });
-
-    // Handle level completion
+    // Handle level events
     socket.on('levelComplete', () => {
         if (!socket.roomId) return;
+        console.log(`🎉 Level completed in room ${socket.roomId}`);
         socket.to(socket.roomId).emit('levelComplete');
     });
 
-    // Handle level restart
     socket.on('restartLevel', () => {
         if (!socket.roomId) return;
-        const room = gameRooms.get(socket.roomId);
-        if (room) {
-            // Reset player positions
-            room.gameState.firePlayer.x = 50;
-            room.gameState.firePlayer.y = 522;
-            room.gameState.firePlayer.velX = 0;
-            room.gameState.firePlayer.velY = 0;
-            room.gameState.firePlayer.onGround = false;
-            room.gameState.firePlayer.jumping = false;
-
-            room.gameState.waterPlayer.x = 100;
-            room.gameState.waterPlayer.y = 522;
-            room.gameState.waterPlayer.velX = 0;
-            room.gameState.waterPlayer.velY = 0;
-            room.gameState.waterPlayer.onGround = false;
-            room.gameState.waterPlayer.jumping = false;
-
-            room.gameState.levelComplete = false;
-            room.broadcastToRoom('gameStateUpdate', room.gameState);
-        }
+        console.log(`🔄 Level restart in room ${socket.roomId}`);
+        socket.to(socket.roomId).emit('restartLevel');
     });
 
-    // Handle next level
     socket.on('nextLevel', () => {
         if (!socket.roomId) return;
         const room = gameRooms.get(socket.roomId);
         if (room) {
-            room.gameState.currentLevel++;
-            room.gameState.levelComplete = false;
-            
-            // Reset player positions
-            room.gameState.firePlayer.x = 50;
-            room.gameState.firePlayer.y = 522;
-            room.gameState.firePlayer.velX = 0;
-            room.gameState.firePlayer.velY = 0;
-            room.gameState.firePlayer.onGround = false;
-            room.gameState.firePlayer.jumping = false;
-
-            room.gameState.waterPlayer.x = 100;
-            room.gameState.waterPlayer.y = 522;
-            room.gameState.waterPlayer.velX = 0;
-            room.gameState.waterPlayer.velY = 0;
-            room.gameState.waterPlayer.onGround = false;
-            room.gameState.waterPlayer.jumping = false;
-
-            room.broadcastToRoom('gameStateUpdate', room.gameState);
+            room.currentLevel++;
+            console.log(`⬆️ Advanced to level ${room.currentLevel} in room ${socket.roomId}`);
+            socket.to(socket.roomId).emit('nextLevel');
         }
     });
 
     // Handle disconnection
     socket.on('disconnect', () => {
-        console.log(`Player disconnected: ${socket.id}`);
+        console.log(`🔌 Player disconnected: ${socket.id}`);
         
         if (socket.roomId) {
             const room = gameRooms.get(socket.roomId);
             if (room) {
                 room.removePlayer(socket.id);
+                console.log(`👋 ${socket.playerName || 'Player'} left room ${socket.roomId}`);
+                
                 socket.to(socket.roomId).emit('playerLeft', {
                     playerType: socket.playerType,
-                    playersCount: room.players.size
+                    playersCount: room.players.size,
+                    playerName: socket.playerName
                 });
 
                 // Clean up empty rooms
                 if (room.players.size === 0) {
                     gameRooms.delete(socket.roomId);
+                    console.log(`🗑️ Deleted empty room: ${socket.roomId}`);
                 }
+            }
+        }
+    });
+
+    // Debug endpoint for room stats
+    socket.on('getRoomStats', () => {
+        if (socket.roomId) {
+            const room = gameRooms.get(socket.roomId);
+            if (room) {
+                socket.emit('roomStats', room.getStats());
             }
         }
     });
 });
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        activeRooms: gameRooms.size,
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Room stats endpoint
+app.get('/stats', (req, res) => {
+    const stats = {
+        totalRooms: gameRooms.size,
+        rooms: Array.from(gameRooms.values()).map(room => room.getStats())
+    };
+    res.json(stats);
+});
+
+// Start server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`🔥💧 Elemental Duo Server running on port ${PORT}`);
-    console.log(`Visit http://localhost:${PORT} to play!`);
+    console.log(`🔥💧 Elemental Duo Server v2.0 running on port ${PORT}`);
+    console.log(`🌐 Ready for multiplayer action!`);
+    console.log(`📊 Health check: http://localhost:${PORT}/health`);
+    console.log(`📈 Room stats: http://localhost:${PORT}/stats`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('🛑 Server shutting down gracefully...');
+    server.close(() => {
+        console.log('✅ Server closed');
+        process.exit(0);
+    });
 });

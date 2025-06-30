@@ -1,9 +1,9 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elemental Duo - Online Multiplayer</title>
+    <title>Elemental Duo - Complete Multiplayer Edition</title>
+    <meta name="description" content="Play Elemental Duo online with friends - 15 cooperative puzzle levels">
     <style>
         * {
             margin: 0;
@@ -27,12 +27,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 2000;
+            backdrop-filter: blur(10px);
         }
 
         .connection-form {
@@ -41,6 +42,8 @@
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            width: 90%;
         }
 
         .connection-form h1 {
@@ -50,6 +53,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
         }
 
         .form-group {
@@ -61,8 +65,16 @@
             font-size: 16px;
             border: none;
             border-radius: 10px;
-            width: 300px;
+            width: 100%;
             text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+            transform: scale(1.02);
         }
 
         .btn {
@@ -75,11 +87,13 @@
             cursor: pointer;
             margin: 10px;
             transition: all 0.3s ease;
+            font-weight: bold;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(45deg, #ff5252, #d63031);
         }
 
         .status-message {
@@ -91,24 +105,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .player-indicator {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 15px;
             z-index: 1500;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(78, 205, 196, 0.3);
         }
 
         .game-header {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             color: white;
             padding: 15px;
             text-align: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
+            border-bottom: 2px solid rgba(78, 205, 196, 0.3);
         }
 
         .game-header h1 {
@@ -118,6 +137,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
         }
 
         .controls {
@@ -125,18 +145,22 @@
             justify-content: space-around;
             margin-top: 10px;
             font-size: 0.9em;
+            flex-wrap: wrap;
         }
 
         .player-controls {
             background: rgba(255, 255, 255, 0.1);
-            padding: 10px;
+            padding: 10px 15px;
             border-radius: 10px;
             backdrop-filter: blur(5px);
+            margin: 5px;
+            transition: all 0.3s ease;
         }
 
         .my-controls {
             border: 2px solid #4ecdc4;
-            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.4);
+            background: rgba(78, 205, 196, 0.2);
         }
 
         #gameCanvas {
@@ -145,14 +169,17 @@
             border: 3px solid #333;
             display: block;
             margin: 0 auto;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
         }
 
         .game-info {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             color: white;
-            padding: 10px;
+            padding: 15px;
             text-align: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
+            border-top: 2px solid rgba(78, 205, 196, 0.3);
+            font-size: 0.9em;
         }
 
         .level-complete {
@@ -162,12 +189,53 @@
             transform: translate(-50%, -50%);
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            padding: 30px;
+            padding: 40px;
             border-radius: 20px;
             text-align: center;
             display: none;
             z-index: 1000;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .level-complete h2 {
+            margin-bottom: 15px;
+            font-size: 2em;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .game-header h1 {
+                font-size: 1.8em;
+            }
+            
+            .controls {
+                font-size: 0.8em;
+            }
+            
+            .connection-form {
+                padding: 30px 20px;
+            }
+            
+            .connection-form h1 {
+                font-size: 2em;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -176,21 +244,21 @@
     <div id="connectionScreen" class="connection-screen">
         <div class="connection-form">
             <h1>🔥💧 Elemental Duo 💧🔥</h1>
-            <p>Online Multiplayer</p>
+            <p style="margin-bottom: 20px; opacity: 0.9;">Complete Online Multiplayer Edition<br>15 Cooperative Puzzle Levels</p>
             
             <div class="form-group">
-                <input type="text" id="playerName" placeholder="Enter your name" maxlength="20">
+                <input type="text" id="playerName" placeholder="Enter your name" maxlength="20" autocomplete="off">
             </div>
             
             <div class="form-group">
-                <input type="text" id="roomId" placeholder="Room ID (or create new)" maxlength="20">
+                <input type="text" id="roomId" placeholder="Room ID (or create new)" maxlength="20" autocomplete="off">
             </div>
             
-            <button class="btn" onclick="joinGame()">Join Game</button>
-            <button class="btn" onclick="createRoom()">Create Room</button>
+            <button class="btn" onclick="joinGame()">🚪 Join Game</button>
+            <button class="btn" onclick="createRoom()">🆕 Create Room</button>
             
             <div class="status-message" id="statusMessage">
-                Enter your name and room ID to start playing!
+                Enter your name and room ID to start your cooperative adventure!
             </div>
         </div>
     </div>
@@ -219,23 +287,26 @@
 
         <div class="game-info">
             <span id="levelInfo">Level 1 - Get both players to their colored doors!</span>
-            <span style="margin-left: 30px;">🔥 Fire Player → Red Door | 💧 Water Player → Blue Door | Both must reach doors together!</span>
+            <span style="margin-left: 30px;">🔥 Fire Player → Red Door | 💧 Water Player → Blue Door | Activate all switches and reach doors together!</span>
         </div>
 
         <div id="levelComplete" class="level-complete">
             <h2>🎉 Level Complete! 🎉</h2>
-            <p>Great teamwork! Ready for the next challenge?</p>
-            <button class="btn" onclick="nextLevel()">Next Level</button>
-            <button class="btn" onclick="restartLevel()">Restart Level</button>
+            <p id="levelCompleteText">Excellent teamwork! Ready for the next challenge?</p>
+            <button class="btn" onclick="nextLevel()">➡️ Next Level</button>
+            <button class="btn" onclick="restartLevel()">🔄 Restart Level</button>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // Socket connection
+        console.log("🎮 Elemental Duo - Complete Edition v2.0 Loading...");
+        
+        // Optimized networking - input-only system
         let socket = null;
         let myPlayerType = null;
         let gameInitialized = false;
+        let lastInputSent = { left: false, right: false, up: false };
 
         // Game variables
         const canvas = document.getElementById('gameCanvas');
@@ -243,7 +314,7 @@
         let currentLevel = 1;
         let gameState = 'playing';
 
-        // Player objects
+        // Player objects with optimized physics
         let firePlayer = {
             x: 50, y: 522, width: 28, height: 28, color: '#ff4757',
             speed: 4, maxSpeed: 6, velX: 0, velY: 0, acceleration: 0.5,
@@ -260,10 +331,11 @@
             keys: { left: false, right: false, up: false }
         };
 
-        // Levels data (same as before)
+        // Complete levels data - All 15 levels with progressive difficulty
         const levels = [
             // Level 1: Basic Introduction
             {
+                name: "First Steps",
                 platforms: [
                     { x: 0, y: 550, width: 1000, height: 50, color: '#8b4513' },
                     { x: 200, y: 450, width: 150, height: 20, color: '#8b4513' },
@@ -282,6 +354,7 @@
             },
             // Level 2: Switch Introduction
             {
+                name: "Learning to Cooperate",
                 platforms: [
                     { x: 0, y: 550, width: 1000, height: 50, color: '#8b4513' },
                     { x: 150, y: 450, width: 100, height: 20, color: '#8b4513' },
@@ -304,10 +377,528 @@
                     { x: 800, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
                 ]
             },
-            // Add more levels here (keeping it shorter for demo)
+            // Level 3: The Bridge Gap
+            {
+                name: "Bridge Building",
+                platforms: [
+                    { x: 0, y: 550, width: 200, height: 50, color: '#8b4513' },
+                    { x: 300, y: 450, width: 100, height: 20, color: '#8b4513' },
+                    { x: 500, y: 400, width: 100, height: 20, color: '#8b4513' },
+                    { x: 700, y: 350, width: 300, height: 20, color: '#8b4513' },
+                    { x: 800, y: 550, width: 200, height: 50, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 220, y: 530, width: 60, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 720, y: 530, width: 60, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 420, y: 380, width: 60, height: 20, type: 'fire', color: '#ff4136' }
+                ],
+                doors: [
+                    { x: 930, y: 500, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 965, y: 500, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 50, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 850, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' }
+                ]
+            },
+            // Level 4: Elevator Teamwork
+            {
+                name: "Rising Together",
+                platforms: [
+                    { x: 0, y: 550, width: 150, height: 50, color: '#8b4513' },
+                    { x: 200, y: 350, width: 80, height: 20, color: '#8b4513' },
+                    { x: 350, y: 450, width: 80, height: 20, color: '#8b4513' },
+                    { x: 500, y: 250, width: 80, height: 20, color: '#8b4513' },
+                    { x: 650, y: 400, width: 80, height: 20, color: '#8b4513' },
+                    { x: 800, y: 150, width: 200, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 300, y: 430, width: 40, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 600, y: 380, width: 40, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 750, y: 130, width: 40, height: 20, type: 'water', color: '#0074d9' }
+                ],
+                doors: [
+                    { x: 820, y: 100, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 865, y: 100, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 230, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 380, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 530, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' }
+                ]
+            },
+            // Level 5: The Split Path
+            {
+                name: "Divided We Stand",
+                platforms: [
+                    { x: 0, y: 550, width: 100, height: 50, color: '#8b4513' },
+                    { x: 150, y: 450, width: 50, height: 20, color: '#8b4513' },
+                    { x: 150, y: 350, width: 50, height: 20, color: '#8b4513' },
+                    { x: 250, y: 250, width: 50, height: 20, color: '#8b4513' },
+                    { x: 350, y: 150, width: 300, height: 20, color: '#8b4513' },
+                    { x: 700, y: 250, width: 50, height: 20, color: '#8b4513' },
+                    { x: 800, y: 350, width: 50, height: 20, color: '#8b4513' },
+                    { x: 800, y: 450, width: 50, height: 20, color: '#8b4513' },
+                    { x: 900, y: 550, width: 100, height: 50, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 120, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 210, y: 430, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 760, y: 430, width: 30, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 870, y: 530, width: 20, height: 20, type: 'water', color: '#0074d9' }
+                ],
+                doors: [
+                    { x: 450, y: 100, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 515, y: 100, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 280, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 730, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            // Level 6: Mirror Maze
+            {
+                name: "Reflection Chamber",
+                platforms: [
+                    { x: 0, y: 550, width: 100, height: 50, color: '#8b4513' },
+                    { x: 150, y: 450, width: 100, height: 20, color: '#8b4513' },
+                    { x: 300, y: 350, width: 100, height: 20, color: '#8b4513' },
+                    { x: 450, y: 450, width: 100, height: 20, color: '#8b4513' },
+                    { x: 600, y: 350, width: 100, height: 20, color: '#8b4513' },
+                    { x: 750, y: 450, width: 100, height: 20, color: '#8b4513' },
+                    { x: 900, y: 550, width: 100, height: 50, color: '#8b4513' },
+                    { x: 400, y: 200, width: 200, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 120, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 270, y: 430, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 420, y: 330, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 570, y: 330, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 720, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 870, y: 430, width: 20, height: 20, type: 'fire', color: '#ff4136' }
+                ],
+                doors: [
+                    { x: 450, y: 150, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 515, y: 150, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 50, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 930, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 480, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 630, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            // Level 7: The Tower Climb
+            {
+                name: "Spiral Ascension",
+                platforms: [
+                    { x: 0, y: 550, width: 200, height: 50, color: '#8b4513' },
+                    { x: 250, y: 500, width: 80, height: 20, color: '#8b4513' },
+                    { x: 380, y: 450, width: 80, height: 20, color: '#8b4513' },
+                    { x: 510, y: 400, width: 80, height: 20, color: '#8b4513' },
+                    { x: 640, y: 350, width: 80, height: 20, color: '#8b4513' },
+                    { x: 500, y: 300, width: 80, height: 20, color: '#8b4513' },
+                    { x: 360, y: 250, width: 80, height: 20, color: '#8b4513' },
+                    { x: 220, y: 200, width: 80, height: 20, color: '#8b4513' },
+                    { x: 400, y: 100, width: 200, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 220, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 340, y: 480, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 470, y: 430, width: 30, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 600, y: 380, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 450, y: 280, width: 40, height: 20, type: 'fire', color: '#ff4136' }
+                ],
+                doors: [
+                    { x: 450, y: 50, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 515, y: 50, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 280, y: 480, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 410, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 540, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 250, y: 180, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' }
+                ]
+            },
+            // Level 8: Hazard Highway
+            {
+                name: "Dangerous Crossing",
+                platforms: [
+                    { x: 0, y: 550, width: 100, height: 50, color: '#8b4513' },
+                    { x: 150, y: 450, width: 60, height: 20, color: '#8b4513' },
+                    { x: 260, y: 350, width: 60, height: 20, color: '#8b4513' },
+                    { x: 370, y: 250, width: 60, height: 20, color: '#8b4513' },
+                    { x: 480, y: 350, width: 60, height: 20, color: '#8b4513' },
+                    { x: 590, y: 450, width: 60, height: 20, color: '#8b4513' },
+                    { x: 700, y: 350, width: 60, height: 20, color: '#8b4513' },
+                    { x: 810, y: 250, width: 60, height: 20, color: '#8b4513' },
+                    { x: 900, y: 450, width: 100, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 120, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 230, y: 330, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 340, y: 230, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 450, y: 330, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 560, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 670, y: 330, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 780, y: 230, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 870, y: 430, width: 20, height: 20, type: 'fire', color: '#ff4136' }
+                ],
+                doors: [
+                    { x: 920, y: 400, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 955, y: 400, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 50, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 180, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 400, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 730, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            // Level 9: The Great Divide
+            {
+                name: "Chasm Challenge",
+                platforms: [
+                    { x: 0, y: 550, width: 150, height: 50, color: '#8b4513' },
+                    { x: 200, y: 400, width: 100, height: 200, color: '#8b4513' },
+                    { x: 350, y: 300, width: 100, height: 20, color: '#8b4513' },
+                    { x: 550, y: 300, width: 100, height: 20, color: '#8b4513' },
+                    { x: 700, y: 400, width: 100, height: 200, color: '#8b4513' },
+                    { x: 850, y: 550, width: 150, height: 50, color: '#8b4513' },
+                    { x: 100, y: 200, width: 80, height: 20, color: '#8b4513' },
+                    { x: 820, y: 200, width: 80, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 320, y: 580, width: 360, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 380, y: 280, width: 40, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 580, y: 280, width: 40, height: 20, type: 'fire', color: '#ff4136' }
+                ],
+                doors: [
+                    { x: 130, y: 150, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 835, y: 150, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 250, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 750, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 400, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 600, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            // Level 10: Switch Symphony
+            {
+                name: "Harmonic Cooperation",
+                platforms: [
+                    { x: 0, y: 550, width: 120, height: 50, color: '#8b4513' },
+                    { x: 170, y: 450, width: 80, height: 20, color: '#8b4513' },
+                    { x: 300, y: 350, width: 80, height: 20, color: '#8b4513' },
+                    { x: 430, y: 250, width: 80, height: 20, color: '#8b4513' },
+                    { x: 560, y: 350, width: 80, height: 20, color: '#8b4513' },
+                    { x: 690, y: 450, width: 80, height: 20, color: '#8b4513' },
+                    { x: 820, y: 550, width: 120, height: 50, color: '#8b4513' },
+                    { x: 400, y: 100, width: 200, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 140, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 270, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 400, y: 330, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 530, y: 330, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 660, y: 430, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 790, y: 530, width: 20, height: 20, type: 'water', color: '#0074d9' }
+                ],
+                doors: [
+                    { x: 450, y: 50, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 515, y: 50, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 60, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 200, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 330, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 460, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 590, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 720, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 880, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            // Level 11: The Gauntlet
+            {
+                name: "Ultimate Gauntlet",
+                platforms: [
+                    { x: 0, y: 550, width: 80, height: 50, color: '#8b4513' },
+                    { x: 120, y: 480, width: 60, height: 20, color: '#8b4513' },
+                    { x: 220, y: 400, width: 60, height: 20, color: '#8b4513' },
+                    { x: 320, y: 320, width: 60, height: 20, color: '#8b4513' },
+                    { x: 420, y: 240, width: 60, height: 20, color: '#8b4513' },
+                    { x: 520, y: 160, width: 60, height: 20, color: '#8b4513' },
+                    { x: 620, y: 240, width: 60, height: 20, color: '#8b4513' },
+                    { x: 720, y: 320, width: 60, height: 20, color: '#8b4513' },
+                    { x: 820, y: 400, width: 60, height: 20, color: '#8b4513' },
+                    { x: 920, y: 550, width: 80, height: 50, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 90, y: 460, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 190, y: 380, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 290, y: 300, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 390, y: 220, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 490, y: 140, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 590, y: 220, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 690, y: 300, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 790, y: 380, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 890, y: 530, width: 20, height: 20, type: 'water', color: '#0074d9' }
+                ],
+                doors: [
+                    { x: 930, y: 500, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 965, y: 500, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 40, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 150, y: 460, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 250, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 350, y: 300, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 450, y: 220, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 550, y: 140, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            // Level 12: Chamber of Cooperation
+            {
+                name: "Cooperation Chambers",
+                platforms: [
+                    { x: 0, y: 550, width: 100, height: 50, color: '#8b4513' },
+                    { x: 150, y: 450, width: 50, height: 100, color: '#8b4513' },
+                    { x: 250, y: 350, width: 50, height: 200, color: '#8b4513' },
+                    { x: 350, y: 400, width: 300, height: 20, color: '#8b4513' },
+                    { x: 700, y: 350, width: 50, height: 200, color: '#8b4513' },
+                    { x: 800, y: 450, width: 50, height: 100, color: '#8b4513' },
+                    { x: 900, y: 550, width: 100, height: 50, color: '#8b4513' },
+                    { x: 400, y: 250, width: 200, height: 20, color: '#8b4513' },
+                    { x: 450, y: 150, width: 100, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 120, y: 530, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 220, y: 430, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 320, y: 380, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 670, y: 380, width: 20, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 770, y: 430, width: 20, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 870, y: 530, width: 20, height: 20, type: 'fire', color: '#ff4136' }
+                ],
+                doors: [
+                    { x: 470, y: 100, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 495, y: 100, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 50, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 175, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 275, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 430, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 570, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 725, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 825, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 950, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            // Level 13: The Elemental Crucible
+            {
+                name: "Elemental Crucible",
+                platforms: [
+                    { x: 0, y: 550, width: 80, height: 50, color: '#8b4513' },
+                    { x: 120, y: 500, width: 40, height: 20, color: '#8b4513' },
+                    { x: 200, y: 450, width: 40, height: 20, color: '#8b4513' },
+                    { x: 280, y: 400, width: 40, height: 20, color: '#8b4513' },
+                    { x: 360, y: 350, width: 40, height: 20, color: '#8b4513' },
+                    { x: 440, y: 300, width: 120, height: 20, color: '#8b4513' },
+                    { x: 600, y: 350, width: 40, height: 20, color: '#8b4513' },
+                    { x: 680, y: 400, width: 40, height: 20, color: '#8b4513' },
+                    { x: 760, y: 450, width: 40, height: 20, color: '#8b4513' },
+                    { x: 840, y: 500, width: 40, height: 20, color: '#8b4513' },
+                    { x: 920, y: 550, width: 80, height: 50, color: '#8b4513' },
+                    { x: 300, y: 200, width: 400, height: 20, color: '#8b4513' },
+                    { x: 450, y: 100, width: 100, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 100, y: 480, width: 15, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 165, y: 480, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 245, y: 430, width: 30, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 325, y: 380, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 405, y: 330, width: 30, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 565, y: 330, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 645, y: 380, width: 30, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 725, y: 430, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 805, y: 480, width: 30, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 885, y: 480, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 350, y: 180, width: 40, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 610, y: 180, width: 40, height: 20, type: 'water', color: '#0074d9' }
+                ],
+                doors: [
+                    { x: 470, y: 50, width: 35, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 495, y: 50, width: 35, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 40, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 140, y: 480, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 220, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 380, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 520, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 620, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 780, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 860, y: 480, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 960, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            // Level 14: Trial of Elements
+            {
+                name: "Trial of Elements",
+                platforms: [
+                    { x: 0, y: 550, width: 60, height: 50, color: '#8b4513' },
+                    { x: 100, y: 500, width: 30, height: 20, color: '#8b4513' },
+                    { x: 170, y: 450, width: 30, height: 20, color: '#8b4513' },
+                    { x: 240, y: 400, width: 30, height: 20, color: '#8b4513' },
+                    { x: 310, y: 350, width: 30, height: 20, color: '#8b4513' },
+                    { x: 380, y: 300, width: 30, height: 20, color: '#8b4513' },
+                    { x: 450, y: 250, width: 100, height: 20, color: '#8b4513' },
+                    { x: 590, y: 300, width: 30, height: 20, color: '#8b4513' },
+                    { x: 660, y: 350, width: 30, height: 20, color: '#8b4513' },
+                    { x: 730, y: 400, width: 30, height: 20, color: '#8b4513' },
+                    { x: 800, y: 450, width: 30, height: 20, color: '#8b4513' },
+                    { x: 870, y: 500, width: 30, height: 20, color: '#8b4513' },
+                    { x: 940, y: 550, width: 60, height: 50, color: '#8b4513' },
+                    { x: 200, y: 200, width: 600, height: 20, color: '#8b4513' },
+                    { x: 350, y: 100, width: 300, height: 20, color: '#8b4513' },
+                    { x: 475, y: 50, width: 50, height: 20, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 80, y: 480, width: 15, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 140, y: 480, width: 25, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 210, y: 430, width: 25, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 280, y: 380, width: 25, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 350, y: 330, width: 25, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 415, y: 280, width: 30, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 555, y: 280, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 625, y: 330, width: 25, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 695, y: 380, width: 25, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 765, y: 430, width: 25, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 835, y: 480, width: 25, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 905, y: 480, width: 15, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 250, y: 180, width: 30, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 320, y: 180, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 450, y: 180, width: 30, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 520, y: 180, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 650, y: 180, width: 30, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 720, y: 180, width: 30, height: 20, type: 'water', color: '#0074d9' },
+                    { x: 400, y: 80, width: 40, height: 20, type: 'fire', color: '#ff4136' },
+                    { x: 560, y: 80, width: 40, height: 20, type: 'water', color: '#0074d9' }
+                ],
+                doors: [
+                    { x: 485, y: 0, width: 20, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 495, y: 0, width: 20, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 30, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 110, y: 480, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 180, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 250, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 320, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 390, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 480, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 500, y: 230, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 610, y: 280, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 680, y: 330, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 750, y: 380, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 820, y: 430, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 890, y: 480, width: 20, height: 20, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 970, y: 530, width: 20, height: 20, activated: false, requiredPlayer: 'water', color: '#82b1ff' }
+                ]
+            },
+            // Level 15: The Final Elemental Challenge
+            {
+                platforms: [
+                    { x: 0, y: 550, width: 50, height: 50, color: '#8b4513' },
+                    { x: 80, y: 520, width: 25, height: 15, color: '#8b4513' },
+                    { x: 130, y: 490, width: 25, height: 15, color: '#8b4513' },
+                    { x: 180, y: 460, width: 25, height: 15, color: '#8b4513' },
+                    { x: 230, y: 430, width: 25, height: 15, color: '#8b4513' },
+                    { x: 280, y: 400, width: 25, height: 15, color: '#8b4513' },
+                    { x: 330, y: 370, width: 25, height: 15, color: '#8b4513' },
+                    { x: 380, y: 340, width: 25, height: 15, color: '#8b4513' },
+                    { x: 430, y: 310, width: 25, height: 15, color: '#8b4513' },
+                    { x: 480, y: 280, width: 40, height: 15, color: '#8b4513' },
+                    { x: 550, y: 310, width: 25, height: 15, color: '#8b4513' },
+                    { x: 600, y: 340, width: 25, height: 15, color: '#8b4513' },
+                    { x: 650, y: 370, width: 25, height: 15, color: '#8b4513' },
+                    { x: 700, y: 400, width: 25, height: 15, color: '#8b4513' },
+                    { x: 750, y: 430, width: 25, height: 15, color: '#8b4513' },
+                    { x: 800, y: 460, width: 25, height: 15, color: '#8b4513' },
+                    { x: 850, y: 490, width: 25, height: 15, color: '#8b4513' },
+                    { x: 900, y: 520, width: 25, height: 15, color: '#8b4513' },
+                    { x: 950, y: 550, width: 50, height: 50, color: '#8b4513' },
+                    { x: 200, y: 250, width: 600, height: 15, color: '#8b4513' },
+                    { x: 300, y: 150, width: 400, height: 15, color: '#8b4513' },
+                    { x: 400, y: 50, width: 200, height: 15, color: '#8b4513' },
+                    { x: 480, y: 0, width: 40, height: 15, color: '#8b4513' }
+                ],
+                hazards: [
+                    { x: 60, y: 500, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 110, y: 470, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 160, y: 440, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 210, y: 410, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 260, y: 380, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 310, y: 350, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 360, y: 320, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 410, y: 290, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 465, y: 260, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 505, y: 260, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 530, y: 290, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 580, y: 320, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 630, y: 350, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 680, y: 380, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 730, y: 410, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 780, y: 440, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 830, y: 470, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 880, y: 500, width: 15, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 925, y: 500, width: 15, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 250, y: 230, width: 20, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 300, y: 230, width: 20, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 380, y: 230, width: 20, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 430, y: 230, width: 20, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 520, y: 230, width: 20, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 570, y: 230, width: 20, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 650, y: 230, width: 20, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 700, y: 230, width: 20, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 350, y: 130, width: 25, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 420, y: 130, width: 25, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 500, y: 130, width: 25, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 580, y: 130, width: 25, height: 15, type: 'water', color: '#0074d9' },
+                    { x: 650, y: 130, width: 25, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 430, y: 30, width: 20, height: 15, type: 'fire', color: '#ff4136' },
+                    { x: 550, y: 30, width: 20, height: 15, type: 'water', color: '#0074d9' }
+                ],
+                doors: [
+                    { x: 490, y: -50, width: 15, height: 50, type: 'fire', color: '#ff4757' },
+                    { x: 505, y: -50, width: 15, height: 50, type: 'water', color: '#3742fa' }
+                ],
+                switches: [
+                    { x: 25, y: 530, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 90, y: 500, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 140, y: 470, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 190, y: 440, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 240, y: 410, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 290, y: 380, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 340, y: 350, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 390, y: 320, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 440, y: 290, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 490, y: 260, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 505, y: 260, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 560, y: 290, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 610, y: 320, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 660, y: 350, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 710, y: 380, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 760, y: 410, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 810, y: 440, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 860, y: 470, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' },
+                    { x: 910, y: 500, width: 15, height: 15, activated: false, requiredPlayer: 'water', color: '#82b1ff' },
+                    { x: 975, y: 530, width: 15, height: 15, activated: false, requiredPlayer: 'fire', color: '#ff8a80' }
+                ]
+            }
         ];
-
-        let currentLevelData = levels[currentLevel - 1];
+                let currentLevelData = levels[currentLevel - 1];
 
         // Connection functions
         function createRoom() {
@@ -336,13 +927,13 @@
             socket = io();
             
             socket.on('connect', () => {
-                console.log('Connected to server');
+                console.log('🔌 Connected to server');
                 socket.emit('joinRoom', { roomId, playerName });
             });
 
             socket.on('playerAssigned', (data) => {
                 myPlayerType = data.playerType;
-                console.log(`Assigned as ${data.playerType} player in room ${data.roomId}`);
+                console.log(`🎮 Assigned as ${data.playerType} player in room ${data.roomId}`);
                 showStatus(`You are the ${data.playerType} player! ${data.playersCount === 2 ? 'Starting game...' : 'Waiting for partner...'}`);
                 
                 if (data.playersCount === 2) {
@@ -353,49 +944,29 @@
             });
 
             socket.on('playerJoined', (data) => {
-                console.log(`${data.playerType} player joined. Total players: ${data.playersCount}`);
+                console.log(`🤝 ${data.playerType} player joined. Total players: ${data.playersCount}`);
                 showStatus('Partner joined! Starting game...');
                 setTimeout(startGame, 1000);
             });
 
             socket.on('roomFull', () => {
-                console.log('Room full error received');
+                console.log('❌ Room full error received');
                 showStatus('Room is full! Try a different room ID.');
                 socket.disconnect();
             });
 
             socket.on('playerLeft', (data) => {
-                showStatus(`${data.playerType} player left the game. Waiting for new partner...`);
+                showStatus(`😞 ${data.playerType} player left the game. Waiting for new partner...`);
             });
 
+            // SIMPLIFIED: Only receive input from other player
             socket.on('playerInput', (data) => {
-                if (data.playerType === 'fire') {
-                    firePlayer.keys = data.keys;
-                } else if (data.playerType === 'water') {
-                    waterPlayer.keys = data.keys;
-                }
-            });
-
-            socket.on('gameStateUpdate', (serverGameState) => {
-                // Update game state from server, but don't override local player's position
-                if (serverGameState.currentLevel !== currentLevel) {
-                    currentLevel = serverGameState.currentLevel;
-                    currentLevelData = levels[currentLevel - 1];
-                    document.getElementById('levelInfo').textContent = `Level ${currentLevel} - Get both players to their colored doors!`;
-                }
-                
-                // Only update the OTHER player's data from server to avoid conflicts
-                if (myPlayerType === 'fire' && serverGameState.waterPlayer) {
-                    // I'm fire player, update water player from server
-                    waterPlayer = { ...waterPlayer, ...serverGameState.waterPlayer };
-                } else if (myPlayerType === 'water' && serverGameState.firePlayer) {
-                    // I'm water player, update fire player from server  
-                    firePlayer = { ...firePlayer, ...serverGameState.firePlayer };
-                }
-                
-                // Update switches and other shared state
-                if (serverGameState.switches && currentLevelData) {
-                    currentLevelData.switches = serverGameState.switches;
+                if (data.playerType !== myPlayerType) {
+                    if (data.playerType === 'fire') {
+                        firePlayer.keys = data.keys;
+                    } else if (data.playerType === 'water') {
+                        waterPlayer.keys = data.keys;
+                    }
                 }
             });
 
@@ -404,8 +975,23 @@
                 gameState = 'complete';
             });
 
+            socket.on('restartLevel', () => {
+                resetLevel();
+            });
+
+            socket.on('nextLevel', () => {
+                if (currentLevel < levels.length) {
+                    currentLevel++;
+                    currentLevelData = levels[currentLevel - 1];
+                    document.getElementById('levelInfo').textContent = `Level ${currentLevel} - Get both players to their colored doors!`;
+                }
+                resetLevel();
+                document.getElementById('levelComplete').style.display = 'none';
+                gameState = 'playing';
+            });
+
             socket.on('disconnect', () => {
-                showStatus('Disconnected from server. Refresh to reconnect.');
+                showStatus('🔌 Disconnected from server. Refresh to reconnect.');
             });
         }
 
@@ -418,7 +1004,6 @@
             document.getElementById('roomInfo').innerHTML = `Room: ${data.roomId}<br>Players: ${data.playersCount}/2`;
             document.getElementById('playerIndicator').style.display = 'block';
             
-            // Highlight my controls
             if (myPlayerType === 'fire') {
                 document.getElementById('fireControls').classList.add('my-controls');
             } else {
@@ -433,9 +1018,8 @@
             gameLoop();
         }
 
-        // Input handling
+        // Simplified input handling - only send when changed
         const keys = {};
-        let lastSentKeys = { left: false, right: false, up: false };
 
         document.addEventListener('keydown', (e) => {
             if (!gameInitialized || !myPlayerType) return;
@@ -443,7 +1027,6 @@
             const key = e.key.toLowerCase();
             keys[key] = true;
             
-            // Prevent default behavior for game keys
             if ((myPlayerType === 'fire' && ['w', 'a', 's', 'd'].includes(key)) ||
                 (myPlayerType === 'water' && ['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key))) {
                 e.preventDefault();
@@ -456,9 +1039,8 @@
             if (!gameInitialized || !myPlayerType) return;
             
             const key = e.key.toLowerCase();
-            keys[key] = false; // FIXED: was incorrectly set to true
+            keys[key] = false;
             
-            // Prevent default behavior for game keys  
             if ((myPlayerType === 'fire' && ['w', 'a', 's', 'd'].includes(key)) ||
                 (myPlayerType === 'water' && ['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key))) {
                 e.preventDefault();
@@ -475,18 +1057,17 @@
                 currentKeys.right = keys['d'] || false;
                 currentKeys.up = keys['w'] || false;
             } else if (myPlayerType === 'water') {
-                // Handle arrow keys properly
                 currentKeys.left = keys['arrowleft'] || false;
                 currentKeys.right = keys['arrowright'] || false;
                 currentKeys.up = keys['arrowup'] || false;
             }
 
-            // Only send if keys changed
-            if (JSON.stringify(currentKeys) !== JSON.stringify(lastSentKeys)) {
+            // Only send if keys actually changed
+            if (JSON.stringify(currentKeys) !== JSON.stringify(lastInputSent)) {
                 socket.emit('playerInput', currentKeys);
-                lastSentKeys = { ...currentKeys };
+                lastInputSent = { ...currentKeys };
                 
-                // Update local player immediately for responsiveness
+                // Update local player immediately
                 if (myPlayerType === 'fire') {
                     firePlayer.keys = currentKeys;
                 } else if (myPlayerType === 'water') {
@@ -495,7 +1076,7 @@
             }
         }
 
-        // Game functions (collision detection, physics, rendering - same as before)
+        // Deterministic physics - same for both players
         function checkCollision(rect1, rect2) {
             return rect1.x < rect2.x + rect2.width &&
                    rect1.x + rect1.width > rect2.x &&
@@ -504,7 +1085,7 @@
         }
 
         function updatePlayer(player, otherPlayer) {
-            // Physics code (same as original)
+            // Horizontal movement
             if (player.keys.left) {
                 player.velX -= player.acceleration;
                 if (player.velX < -player.maxSpeed) player.velX = -player.maxSpeed;
@@ -606,7 +1187,6 @@
                 player.velX = 0;
             }
             
-            // Death boundary
             if (player.y > canvas.height + 100) {
                 resetLevel();
             }
@@ -616,24 +1196,22 @@
             if (!currentLevelData || !currentLevelData.hazards) return;
             
             for (let hazard of currentLevelData.hazards) {
-                // Fire player collision with water hazards
                 if (hazard.type === 'water' &&
                     firePlayer.x < hazard.x + hazard.width &&
                     firePlayer.x + firePlayer.width > hazard.x &&
                     firePlayer.y < hazard.y + hazard.height &&
                     firePlayer.y + firePlayer.height > hazard.y) {
-                    console.log('Fire player hit water hazard!');
+                    console.log('🔥 Fire player hit water hazard!');
                     resetLevel();
                     return;
                 }
                 
-                // Water player collision with fire hazards
                 if (hazard.type === 'fire' &&
                     waterPlayer.x < hazard.x + hazard.width &&
                     waterPlayer.x + waterPlayer.width > hazard.x &&
                     waterPlayer.y < hazard.y + hazard.height &&
                     waterPlayer.y + waterPlayer.height > hazard.y) {
-                    console.log('Water player hit fire hazard!');
+                    console.log('💧 Water player hit fire hazard!');
                     resetLevel();
                     return;
                 }
@@ -641,6 +1219,8 @@
         }
 
         function checkSwitchActivation() {
+            if (!currentLevelData || !currentLevelData.switches) return;
+            
             for (let switchObj of currentLevelData.switches) {
                 const player = switchObj.requiredPlayer === 'fire' ? firePlayer : waterPlayer;
                 
@@ -654,6 +1234,8 @@
         }
 
         function checkWinCondition() {
+            if (!currentLevelData || !currentLevelData.doors) return;
+            
             let fireAtDoor = false;
             let waterAtDoor = false;
             
@@ -675,7 +1257,7 @@
                 }
             }
             
-            let allSwitchesActivated = currentLevelData.switches.length === 0 || 
+            let allSwitchesActivated = !currentLevelData.switches || currentLevelData.switches.length === 0 || 
                                      currentLevelData.switches.every(s => s.activated);
             
             if (fireAtDoor && waterAtDoor && allSwitchesActivated && gameState === 'playing') {
@@ -752,15 +1334,17 @@
                 }
             }
             
-            for (let switchObj of currentLevelData.switches) {
-                ctx.fillStyle = switchObj.activated ? '#4caf50' : switchObj.color;
-                ctx.fillRect(switchObj.x, switchObj.y, switchObj.width, switchObj.height);
-                
-                ctx.fillStyle = 'white';
-                ctx.font = '12px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(switchObj.activated ? '✓' : '○', 
-                           switchObj.x + switchObj.width/2, switchObj.y + switchObj.height/2 + 3);
+            if (currentLevelData.switches) {
+                for (let switchObj of currentLevelData.switches) {
+                    ctx.fillStyle = switchObj.activated ? '#4caf50' : switchObj.color;
+                    ctx.fillRect(switchObj.x, switchObj.y, switchObj.width, switchObj.height);
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(switchObj.activated ? '✓' : '○', 
+                               switchObj.x + switchObj.width/2, switchObj.y + switchObj.height/2 + 3);
+                }
             }
             
             for (let door of currentLevelData.doors) {
@@ -790,48 +1374,20 @@
             }
         }
 
-        // Add throttling for server updates
-        let lastServerUpdate = 0;
-        const SERVER_UPDATE_INTERVAL = 50; // Update server every 50ms (20 FPS)
-
+        // SIMPLIFIED GAME LOOP - No server synchronization of positions
         function gameLoop() {
             if (!gameInitialized) return;
             
             if (gameState === 'playing') {
-                // Each player only updates their own character to avoid conflicts
-                if (myPlayerType === 'fire') {
-                    updatePlayer(firePlayer, waterPlayer);
-                } else if (myPlayerType === 'water') {
-                    updatePlayer(waterPlayer, firePlayer);
-                }
+                // Both players update both characters locally for smooth movement
+                updatePlayer(firePlayer, waterPlayer);
+                updatePlayer(waterPlayer, firePlayer);
                 
-                // Both players check collisions for safety
                 checkHazardCollisions();
                 checkSwitchActivation();
                 checkWinCondition();
-                
-                // Throttle server updates to reduce network spam
-                const now = Date.now();
-                if (now - lastServerUpdate > SERVER_UPDATE_INTERVAL) {
-                    // Send my player's state to server
-                    if (myPlayerType === 'fire') {
-                        socket.emit('gameStateUpdate', {
-                            firePlayer: firePlayer,
-                            currentLevel: currentLevel,
-                            switches: currentLevelData ? currentLevelData.switches : []
-                        });
-                    } else if (myPlayerType === 'water') {
-                        socket.emit('gameStateUpdate', {
-                            waterPlayer: waterPlayer,
-                            currentLevel: currentLevel,
-                            switches: currentLevelData ? currentLevelData.switches : []
-                        });
-                    }
-                    lastServerUpdate = now;
-                }
             }
             
-            // Always render the game
             drawLevel();
             drawPlayer(firePlayer, '🔥');
             drawPlayer(waterPlayer, '💧');
@@ -840,20 +1396,54 @@
         }
 
         function resetLevel() {
+            firePlayer.x = 50;
+            firePlayer.y = 522;
+            firePlayer.velX = 0;
+            firePlayer.velY = 0;
+            firePlayer.onGround = false;
+            firePlayer.jumping = false;
+            
+            waterPlayer.x = 100;
+            waterPlayer.y = 522;
+            waterPlayer.velX = 0;
+            waterPlayer.velY = 0;
+            waterPlayer.onGround = false;
+            waterPlayer.jumping = false;
+            
+            if (currentLevelData && currentLevelData.switches) {
+                for (let switchObj of currentLevelData.switches) {
+                    switchObj.activated = false;
+                }
+            }
+            
+            gameState = 'playing';
             socket.emit('restartLevel');
         }
 
         function nextLevel() {
+            if (currentLevel < levels.length) {
+                currentLevel++;
+                currentLevelData = levels[currentLevel - 1];
+                document.getElementById('levelInfo').textContent = `Level ${currentLevel} - Get both players to their colored doors!`;
+                resetLevel();
+            } else {
+                // Game completed
+                showStatus('🎉 Congratulations! You completed all 15 levels together! 🎉');
+                currentLevel = 1;
+                currentLevelData = levels[0];
+                document.getElementById('levelInfo').textContent = 'Level 1 - Get both players to their colored doors!';
+                resetLevel();
+            }
             socket.emit('nextLevel');
             document.getElementById('levelComplete').style.display = 'none';
             gameState = 'playing';
         }
 
         function restartLevel() {
-            socket.emit('restartLevel');
             document.getElementById('levelComplete').style.display = 'none';
-            gameState = 'playing';
+            resetLevel();
         }
+
+        console.log("🎮 Elemental Duo - Complete Edition v2.0 Ready!");
     </script>
 </body>
-</html>
